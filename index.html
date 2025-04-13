@@ -6,6 +6,7 @@
     <meta name="description" content="Enter Zen - Interactive book experience leading to zen stories and wisdom">
     <title>Enter Zen From There</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/zen-elements.css">
     <!-- Preload images for better performance -->
     <link rel="preload" href="assets/book2.png" as="image">
     <!-- <link rel="preload" href="assets/cosmic.png" as="image"> -->
@@ -15,6 +16,151 @@
         <!-- Removed energy-wisps-container and its contents -->
         <!-- The stars-container will be added here by JS -->
     </div>
+    
+    <!-- SVG Definitions for Zen Elements -->
+    <svg id="mandala-svg" style="display:none" xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+      <!-- Simple Zen Mandala - will be very faint in the background -->
+      <g id="mandala-pattern-1" fill="none" stroke="white" stroke-width="0.5" opacity="0.08">
+        <!-- Center circle -->
+        <circle cx="300" cy="300" r="30"/>
+        
+        <!-- Inner lotus petals -->
+        <g id="inner-petals">
+          <path d="M300 270 C320 250, 340 250, 350 270 C340 290, 320 290, 300 270" />
+          <path d="M300 270 C280 250, 260 250, 250 270 C260 290, 280 290, 300 270" />
+          <path d="M300 330 C320 350, 340 350, 350 330 C340 310, 320 310, 300 330" />
+          <path d="M300 330 C280 350, 260 350, 250 330 C260 310, 280 310, 300 330" />
+          <path d="M270 300 C250 320, 250 340, 270 350 C290 340, 290 320, 270 300" />
+          <path d="M270 300 C250 280, 250 260, 270 250 C290 260, 290 280, 270 300" />
+          <path d="M330 300 C350 320, 350 340, 330 350 C310 340, 310 320, 330 300" />
+          <path d="M330 300 C350 280, 350 260, 330 250 C310 260, 310 280, 330 300" />
+        </g>
+        
+        <!-- Middle geometric pattern -->
+        <g id="middle-pattern">
+          <circle cx="300" cy="300" r="80" />
+          <circle cx="300" cy="300" r="120" />
+          <circle cx="300" cy="300" r="150" />
+          
+          <!-- Radiating lines -->
+          <g id="radial-lines">
+            <line x1="300" y1="150" x2="300" y2="450" />
+            <line x1="150" y1="300" x2="450" y2="300" />
+            <line x1="194" y1="194" x2="406" y2="406" />
+            <line x1="194" y1="406" x2="406" y2="194" />
+            
+            <line x1="300" y1="170" x2="300" y2="430" transform="rotate(22.5 300 300)" />
+            <line x1="170" y1="300" x2="430" y2="300" transform="rotate(22.5 300 300)" />
+            <line x1="300" y1="170" x2="300" y2="430" transform="rotate(45 300 300)" />
+            <line x1="170" y1="300" x2="430" y2="300" transform="rotate(45 300 300)" />
+            <line x1="300" y1="170" x2="300" y2="430" transform="rotate(67.5 300 300)" />
+            <line x1="170" y1="300" x2="430" y2="300" transform="rotate(67.5 300 300)" />
+          </g>
+        </g>
+        
+        <!-- Outer decoration -->
+        <g id="outer-pattern">
+          <circle cx="300" cy="300" r="200" />
+          <circle cx="300" cy="300" r="240" />
+          
+          <!-- Dot pattern around outer rim -->
+          <g id="outer-dots" fill="white" stroke="none">
+            <circle cx="300" cy="60" r="1" />
+            <circle cx="300" cy="540" r="1" />
+            <circle cx="60" cy="300" r="1" />
+            <circle cx="540" cy="300" r="1" />
+          </g>
+        </g>
+      </g>
+      
+      <!-- Second mandala style - flower of life based -->
+      <g id="mandala-pattern-2" fill="none" stroke="white" stroke-width="0.5" opacity="0.06">
+        <!-- Flower of Life pattern -->
+        <g id="flower-of-life">
+          <circle cx="300" cy="300" r="50" />
+          <circle cx="350" cy="300" r="50" />
+          <circle cx="325" cy="343.3" r="50" />
+          <circle cx="275" cy="343.3" r="50" />
+          <circle cx="250" cy="300" r="50" />
+          <circle cx="275" cy="256.7" r="50" />
+          <circle cx="325" cy="256.7" r="50" />
+          
+          <!-- Outer layer of circles -->
+          <circle cx="400" cy="300" r="50" />
+          <circle cx="375" cy="386.6" r="50" />
+          <circle cx="325" cy="386.6" r="50" />
+          <circle cx="275" cy="386.6" r="50" />
+          <circle cx="225" cy="386.6" r="50" />
+          <circle cx="200" cy="300" r="50" />
+          <circle cx="225" cy="213.4" r="50" />
+          <circle cx="275" cy="213.4" r="50" />
+          <circle cx="325" cy="213.4" r="50" />
+          <circle cx="375" cy="213.4" r="50" />
+        </g>
+        
+        <!-- Center decoration -->
+        <g id="center-decoration">
+          <circle cx="300" cy="300" r="20" />
+          <circle cx="300" cy="300" r="15" />
+          <circle cx="300" cy="300" r="10" />
+          <circle cx="300" cy="300" r="5" />
+        </g>
+        
+        <!-- Outer rim -->
+        <circle cx="300" cy="300" r="240" />
+      </g>
+      
+      <!-- Sacred geometry pattern - Metatron's Cube -->
+      <g id="metatron-cube" fill="none" stroke="white" stroke-width="0.5" opacity="0.07">
+        <!-- Inner circles -->
+        <circle cx="300" cy="300" r="40" />
+        
+        <!-- Hexagon pattern -->
+        <path d="M300 260 L340 280 L340 320 L300 340 L260 320 L260 280 Z" />
+        
+        <!-- Inner star pattern -->
+        <path d="M300 260 L340 320 M340 280 L260 320 M300 340 L260 280" />
+        
+        <!-- Outer circles -->
+        <circle cx="300" cy="260" r="20" />
+        <circle cx="340" cy="280" r="20" />
+        <circle cx="340" cy="320" r="20" />
+        <circle cx="300" cy="340" r="20" />
+        <circle cx="260" cy="320" r="20" />
+        <circle cx="260" cy="280" r="20" />
+        
+        <!-- Outer connections -->
+        <path d="M300 240 L360 270 L360 330 L300 360 L240 330 L240 270 Z" />
+        
+        <!-- Surrounding decorative circles -->
+        <circle cx="300" cy="300" r="120" />
+        <circle cx="300" cy="300" r="180" />
+        <circle cx="300" cy="300" r="230" />
+      </g>
+      
+      <!-- Sri Yantra based pattern -->
+      <g id="sri-yantra" fill="none" stroke="white" stroke-width="0.5" opacity="0.08">
+        <!-- Center point -->
+        <circle cx="300" cy="300" r="5" fill="white" />
+        
+        <!-- Inner triangles -->
+        <path d="M300 250 L330 330 L270 330 Z" />
+        <path d="M300 350 L350 270 L250 270 Z" />
+        
+        <!-- Middle triangles -->
+        <path d="M300 230 L345 340 L255 340 Z" />
+        <path d="M300 370 L360 260 L240 260 Z" />
+        
+        <!-- Outer triangles -->
+        <path d="M300 210 L360 350 L240 350 Z" />
+        <path d="M300 390 L370 250 L230 250 Z" />
+        
+        <!-- Surrounding circles -->
+        <circle cx="300" cy="300" r="120" />
+        <circle cx="300" cy="300" r="190" />
+        <circle cx="300" cy="300" r="195" />
+      </g>
+    </svg>
     <main class="container">
         <div class="book-container" tabindex="0" role="button" aria-label="Interactive book. Click to open and enter zen world">
             <div class="book">
@@ -39,5 +185,6 @@
     <div class="loading-indicator" aria-label="Loading, please wait..."></div>
     
     <script src="js/script.js"></script>
+    <script src="js/zen-elements.js"></script>
 </body>
 </html>

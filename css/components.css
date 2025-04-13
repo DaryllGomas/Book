@@ -8,15 +8,99 @@
     top: 0;
     left: 0;
     overflow: hidden;
+    /* Add smooth transition for parallax movement */
+    transition: transform 0.2s cubic-bezier(0.215, 0.61, 0.355, 1);
+    will-change: transform;
+}
+
+/* Layer-specific properties for depth effect */
+.stars-layer-1 {
+    z-index: -4; /* Furthest back */
+    filter: blur(0.5px); /* Slight blur for distance */
+}
+
+.stars-layer-2 {
+    z-index: -3;
+    filter: blur(0.25px);
+}
+
+.stars-layer-3 {
+    z-index: -2;
+    /* No blur */
+}
+
+.stars-layer-4 {
+    z-index: -1; /* Closest to viewer */
+    /* Sharper, no blur */
 }
 
 .star {
     position: absolute;
+    border-radius: 50%;
+    animation-name: twinkle;
+    animation-iteration-count: infinite;
+    animation-timing-function: alternate;
+    will-change: opacity, transform, box-shadow;
+}
+
+/* Size variations with layer-specific modifications */
+.star-small {
+    width: 1px;
+    height: 1px;
+    animation-duration: 2s; /* Faster twinkle */
+}
+
+.star-medium {
     width: 2px;
     height: 2px;
-    background-color: #fff;
-    border-radius: 50%;
-    animation: twinkle 3s infinite alternate;
+    animation-duration: 3s; /* Medium twinkle */
+}
+
+.star-large {
+    width: 3px;
+    height: 3px;
+    animation-duration: 4s; /* Slower twinkle */
+}
+
+/* Layer-specific star styling */
+.star-layer-1 {
+    background-color: rgba(255, 255, 255, 0.7);
+    transform: scale(0.8);
+}
+
+.star-layer-2 {
+    background-color: rgba(255, 255, 255, 0.8);
+    transform: scale(0.9);
+}
+
+.star-layer-3 {
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: scale(1);
+}
+
+.star-layer-4 {
+    background-color: rgb(255, 255, 255);
+    transform: scale(1.1);
+}
+
+/* Special stars that occasionally "flare" */
+.star-flare {
+    animation: twinkle 3s infinite alternate, flare 15s infinite;
+}
+
+/* Shooting Star Effect removed as requested */
+
+/* Prevent user selection for better experience */
+.cosmic-background, .stars-container, .star {
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: none; /* Make sure these don't interfere with click events */
+}
+
+/* Make sure book container gets pointer events */
+.book-container {
+    pointer-events: auto;
+    z-index: 10; /* Ensure book is above all background elements */
 }
 
 /* Book components */

@@ -248,36 +248,116 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /**
-     * Creates and animates background stars with parallax effect
-     */
-    const createStars = () => {
-        const cosmicBackground = document.querySelector('.cosmic-background');
-        const starsContainer = document.createElement('div');
-        starsContainer.className = 'stars-container';
+    * Creates and animates background stars with parallax effect
+    */
+const createStars = () => {
+    const cosmicBackground = document.querySelector('.cosmic-background');
+    
+    // Create 4 star layers with different depths
+    const layerCount = 4;
+    
+    for (let layer = 1; layer <= layerCount; layer++) {
+    const starsContainer = document.createElement('div');
+    starsContainer.className = `stars-container stars-layer-${layer}`;
+    
+        // Set data-speed for parallax
+        starsContainer.dataset.speed = 0.1 * layer; // Higher layer = faster movement
         
-        const starCounts = { small: 70, medium: 40, large: 20 }; // Adjust counts as needed
+    // Different star densities for different layers
+    const layerDensityMultiplier = 1 - (layer * 0.1); // Reducing density for farther layers
+    const baseOpacity = 0.3 + (layer * 0.15); // Increasing opacity for closer layers
+    
+    const starCounts = { 
+    small: Math.floor(80 * layerDensityMultiplier), 
+    medium: Math.floor(40 * layerDensityMultiplier), 
+    large: Math.floor(20 * layerDensityMultiplier)
+    };
+        
         const starClasses = {
-            small: 'star star-small',
-            medium: 'star star-medium',
-            large: 'star star-large'
+            small: `star star-small star-layer-${layer}`,
+            medium: `star star-medium star-layer-${layer}`,
+            large: `star star-large star-layer-${layer}`
         };
 
+        // Create stars for this layer
         for (const size in starCounts) {
             for (let i = 0; i < starCounts[size]; i++) {
                 const star = document.createElement('div');
                 star.className = starClasses[size];
                 star.style.left = `${Math.random() * 100}%`;
                 star.style.top = `${Math.random() * 100}%`;
-                // Delay and duration variations can be adjusted in CSS per class
-                star.style.animationDelay = `${Math.random() * 5}s`; 
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                
+                // Set base opacity per layer
+                star.style.opacity = baseOpacity;
+                
                 starsContainer.appendChild(star);
             }
         }
         
         // Add the container with all stars to the background
         cosmicBackground.appendChild(starsContainer);
-        console.log('Multi-layer stars created and added to background');
-    };
+    }
+    
+    console.log('Multi-layer parallax stars created');
+    
+    // Add parallax effect based on mouse movement
+    document.addEventListener('mousemove', handleParallax);
+    
+    // Initial position for stars
+    centerStarLayers();
+};
+
+/**
+ * Handle parallax effect based on mouse position
+ */
+const handleParallax = (e) => {
+    // Don't apply parallax if book is open
+    if (document.querySelector('.book.open')) return;
+    
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+    
+    // Calculate center point of window
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+    
+    // Calculate offset from center (normalized -1 to 1)
+    const offsetX = (mouseX - centerX) / centerX;
+    const offsetY = (mouseY - centerY) / centerY;
+    
+    // Apply parallax to each layer with different intensity
+    const starLayers = document.querySelectorAll('.stars-container');
+    
+    starLayers.forEach(layer => {
+        const speed = parseFloat(layer.dataset.speed) || 0.1; // Default to 0.1 if data-speed is not set
+        const translateX = -offsetX * 30 * speed; // Adjust multiplier for movement amount
+        const translateY = -offsetY * 20 * speed;
+        
+        // Apply the transform with smooth transition
+        layer.style.transform = `translate(${translateX}px, ${translateY}px)`;
+    });
+};
+
+/**
+ * Reset star positions to center when mouse leaves window
+ */
+const centerStarLayers = () => {
+    const starLayers = document.querySelectorAll('.stars-container');
+    
+    starLayers.forEach(layer => {
+        layer.style.transform = 'translate(0, 0)';
+    });
+};
+
+// Add event listener for mouse leaving the window
+document.addEventListener('mouseleave', centerStarLayers);
+
+// Add resize handler to maintain proper parallax
+window.addEventListener('resize', () => {
+    // Reset any existing transforms
+    centerStarLayers();
+});
     
     /**
      * Event Listeners
@@ -313,4 +393,64 @@ document.addEventListener('DOMContentLoaded', function() {
     preloadLink.href = config.targetUrl;
     document.head.appendChild(preloadLink);
     console.log('Target page preloaded:', config.targetUrl);
+    
+    /**
+     * Add special enhancements to random stars
+     */
+    const enhanceStars = () => {
+        // Get all stars
+        const stars = document.querySelectorAll('.star');
+        
+        // Star colors - slight variations for visual interest
+        const starColors = [
+            'rgb(255, 255, 255)', // Pure white
+            'rgb(235, 243, 255)', // Slightly blue-white
+            'rgb(255, 245, 235)', // Slightly yellow-white
+            'rgb(255, 240, 240)', // Slightly red-white
+            'rgb(240, 255, 245)'  // Slightly green-white
+        ];
+        
+        // Make about 5% of stars have color variations
+        const coloredStarCount = Math.floor(stars.length * 0.05);
+        
+        // Make about 1% of stars have the flaring effect
+        const flareStarCount = Math.floor(stars.length * 0.01);
+        
+        // Apply random colors to some stars
+        for (let i = 0; i < coloredStarCount; i++) {
+            const randomStar = stars[Math.floor(Math.random() * stars.length)];
+            const randomColor = starColors[Math.floor(Math.random() * starColors.length)];
+            randomStar.style.backgroundColor = randomColor;
+        }
+        
+        // Apply flaring effect to some stars
+        for (let i = 0; i < flareStarCount; i++) {
+            const randomStar = stars[Math.floor(Math.random() * stars.length)];
+            
+            // Only apply to medium and large stars for better visual effect
+            if (randomStar.classList.contains('star-medium') || 
+                randomStar.classList.contains('star-large')) {
+                randomStar.classList.add('star-flare');
+            }
+        }
+        
+        console.log(`Enhanced ${coloredStarCount} stars with color variations and ${flareStarCount} stars with flaring effect`);
+    };
+
+    /**
+     * Shooting star functions removed as requested
+     */
+
+    /**
+     * Initialize all star enhancements
+     */
+    const initializeStarEnhancements = () => {
+        setTimeout(() => {
+            enhanceStars();
+            // Shooting stars removed as requested
+        }, 1000); // Short delay to ensure stars are created first
+    };
+    
+    // Initialize star enhancements
+    initializeStarEnhancements();
 });

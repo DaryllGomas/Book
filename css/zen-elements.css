@@ -1,0 +1,118 @@
+/* Zen-themed Space Elements CSS */
+
+/* Container styles */
+.mandala-container,
+.energy-centers-container,
+.harmonic-waves-container,
+.sacred-geometry-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* Mandala styles */
+.mandala {
+    will-change: transform;
+    filter: blur(1px); /* Slight blur for ethereal effect */
+}
+
+/* Energy center styles */
+.energy-center {
+    will-change: transform, opacity;
+    filter: blur(3px); /* Soft glow effect */
+}
+
+/* Energy center container needs to be above cosmic background but below book */
+.energy-centers-container {
+    z-index: -2;
+}
+
+/* Wave styles */
+.wave-layer {
+    will-change: transform;
+    filter: blur(2px); /* Soft waves */
+}
+
+/* Sacred geometry styles */
+.sacred-geometry {
+    will-change: opacity;
+    filter: blur(1px); /* Subtle spiritual patterns */
+}
+
+/* Common transition for all zen elements */
+.mandala,
+.energy-center,
+.wave,
+.sacred-geometry {
+    transition: opacity 2s ease-in-out;
+}
+
+/* Make sure cosmic background doesn't interfere with book interactions */
+.cosmic-background,
+.stars-container,
+.star,
+.mandala-container,
+.energy-centers-container,
+.harmonic-waves-container,
+.sacred-geometry-container,
+.mandala,
+.energy-center,
+.wave-layer,
+.wave,
+.sacred-geometry {
+    pointer-events: none;
+}
+
+/* Layering - ensure all elements get proper z-index */
+.cosmic-background {
+    z-index: -10;
+}
+
+.stars-layer-1 { z-index: -9; }
+.stars-layer-2 { z-index: -8; }
+.stars-layer-3 { z-index: -7; }
+.stars-layer-4 { z-index: -6; }
+
+.mandala-container { z-index: -5; }
+.sacred-geometry-container { z-index: -4; }
+.energy-centers-container { z-index: -3; }
+.harmonic-waves-container { z-index: -2; }
+
+/* Make sure book is above all background elements */
+.book-container {
+    z-index: 10;
+    pointer-events: auto;
+}
+
+/* Animation for initial fade-in of all zen elements */
+@keyframes fadeInZen {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.mandala-container,
+.energy-centers-container,
+.harmonic-waves-container,
+.sacred-geometry-container {
+    animation: fadeInZen 5s ease-in-out forwards;
+}
+
+/* Responsive adjustments for small screens */
+@media (max-width: 768px) {
+    .mandala, .sacred-geometry {
+        opacity: 0.04 !important; /* Slightly stronger on small screens */
+    }
+    
+    .energy-center {
+        filter: blur(2px); /* Less blur on small screens */
+    }
+}

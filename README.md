@@ -5,7 +5,7 @@ An immersive, interactive landing page featuring a 3D book that opens and redire
 ## Features
 
 - **Interactive 3D Book**: Click or press Enter/Space to animate the book opening
-- **Immersive Background**: Cosmic background with animated twinkling stars
+- **Immersive 3D Cosmic Background**: Multi-layered parallax star field with depth effect, shooting stars and dynamic star effects
 - **Accessibility Support**: Keyboard navigation and screen reader support
 - **Sound Effects**: Subtle audio feedback when the book is opened
 - **Smooth Transitions**: Polished animations between states
