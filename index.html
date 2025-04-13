@@ -8,160 +8,51 @@
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="css/zen-elements.css">
     <link rel="stylesheet" href="css/enhanced-zen.css">
+    <link rel="stylesheet" href="css/webgl-zen.css">
     <!-- Preload images for better performance -->
     <link rel="preload" href="assets/book2.png" as="image">
     <!-- <link rel="preload" href="assets/cosmic.png" as="image"> -->
 </head>
 <body>
-    <div class="cosmic-background" aria-hidden="true">
-        <!-- Removed energy-wisps-container and its contents -->
-        <!-- The stars-container will be added here by JS -->
+    <!-- WebGL Zen Space Container -->
+    <div id="zen-space-container"></div>
+    
+    <!-- Yin-Yang Balance Indicator -->
+    <div id="balance-indicator">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="40" fill="black" stroke="white" stroke-width="2"/>
+        <path d="M50,10 a40,40 0 0,1 0,80 a20,20 0 0,0 0,-40 a20,20 0 0,0 0,-40" fill="white"/>
+        <circle cx="50" cy="30" r="5" fill="black"/>
+        <circle cx="50" cy="70" r="5" fill="white"/>
+      </svg>
     </div>
     
-    <!-- SVG Definitions for Zen Elements -->
-    <svg id="mandala-svg" style="display:none" xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
-      <!-- Simple Zen Mandala - will be very faint in the background -->
-      <g id="mandala-pattern-1" fill="none" stroke="white" stroke-width="0.5" opacity="0.08">
-        <!-- Center circle -->
-        <circle cx="300" cy="300" r="30"/>
-        
-        <!-- Inner lotus petals -->
-        <g id="inner-petals">
-          <path d="M300 270 C320 250, 340 250, 350 270 C340 290, 320 290, 300 270" />
-          <path d="M300 270 C280 250, 260 250, 250 270 C260 290, 280 290, 300 270" />
-          <path d="M300 330 C320 350, 340 350, 350 330 C340 310, 320 310, 300 330" />
-          <path d="M300 330 C280 350, 260 350, 250 330 C260 310, 280 310, 300 330" />
-          <path d="M270 300 C250 320, 250 340, 270 350 C290 340, 290 320, 270 300" />
-          <path d="M270 300 C250 280, 250 260, 270 250 C290 260, 290 280, 270 300" />
-          <path d="M330 300 C350 320, 350 340, 330 350 C310 340, 310 320, 330 300" />
-          <path d="M330 300 C350 280, 350 260, 330 250 C310 260, 310 280, 330 300" />
-        </g>
-        
-        <!-- Middle geometric pattern -->
-        <g id="middle-pattern">
-          <circle cx="300" cy="300" r="80" />
-          <circle cx="300" cy="300" r="120" />
-          <circle cx="300" cy="300" r="150" />
-          
-          <!-- Radiating lines -->
-          <g id="radial-lines">
-            <line x1="300" y1="150" x2="300" y2="450" />
-            <line x1="150" y1="300" x2="450" y2="300" />
-            <line x1="194" y1="194" x2="406" y2="406" />
-            <line x1="194" y1="406" x2="406" y2="194" />
-            
-            <line x1="300" y1="170" x2="300" y2="430" transform="rotate(22.5 300 300)" />
-            <line x1="170" y1="300" x2="430" y2="300" transform="rotate(22.5 300 300)" />
-            <line x1="300" y1="170" x2="300" y2="430" transform="rotate(45 300 300)" />
-            <line x1="170" y1="300" x2="430" y2="300" transform="rotate(45 300 300)" />
-            <line x1="300" y1="170" x2="300" y2="430" transform="rotate(67.5 300 300)" />
-            <line x1="170" y1="300" x2="430" y2="300" transform="rotate(67.5 300 300)" />
-          </g>
-        </g>
-        
-        <!-- Outer decoration -->
-        <g id="outer-pattern">
-          <circle cx="300" cy="300" r="200" />
-          <circle cx="300" cy="300" r="240" />
-          
-          <!-- Dot pattern around outer rim -->
-          <g id="outer-dots" fill="white" stroke="none">
-            <circle cx="300" cy="60" r="1" />
-            <circle cx="300" cy="540" r="1" />
-            <circle cx="60" cy="300" r="1" />
-            <circle cx="540" cy="300" r="1" />
-          </g>
-        </g>
-      </g>
-      
-      <!-- Second mandala style - flower of life based -->
-      <g id="mandala-pattern-2" fill="none" stroke="white" stroke-width="0.5" opacity="0.06">
-        <!-- Flower of Life pattern -->
-        <g id="flower-of-life">
-          <circle cx="300" cy="300" r="50" />
-          <circle cx="350" cy="300" r="50" />
-          <circle cx="325" cy="343.3" r="50" />
-          <circle cx="275" cy="343.3" r="50" />
-          <circle cx="250" cy="300" r="50" />
-          <circle cx="275" cy="256.7" r="50" />
-          <circle cx="325" cy="256.7" r="50" />
-          
-          <!-- Outer layer of circles -->
-          <circle cx="400" cy="300" r="50" />
-          <circle cx="375" cy="386.6" r="50" />
-          <circle cx="325" cy="386.6" r="50" />
-          <circle cx="275" cy="386.6" r="50" />
-          <circle cx="225" cy="386.6" r="50" />
-          <circle cx="200" cy="300" r="50" />
-          <circle cx="225" cy="213.4" r="50" />
-          <circle cx="275" cy="213.4" r="50" />
-          <circle cx="325" cy="213.4" r="50" />
-          <circle cx="375" cy="213.4" r="50" />
-        </g>
-        
-        <!-- Center decoration -->
-        <g id="center-decoration">
-          <circle cx="300" cy="300" r="20" />
-          <circle cx="300" cy="300" r="15" />
-          <circle cx="300" cy="300" r="10" />
-          <circle cx="300" cy="300" r="5" />
-        </g>
-        
-        <!-- Outer rim -->
-        <circle cx="300" cy="300" r="240" />
-      </g>
-      
-      <!-- Sacred geometry pattern - Metatron's Cube -->
-      <g id="metatron-cube" fill="none" stroke="white" stroke-width="0.5" opacity="0.07">
-        <!-- Inner circles -->
-        <circle cx="300" cy="300" r="40" />
-        
-        <!-- Hexagon pattern -->
-        <path d="M300 260 L340 280 L340 320 L300 340 L260 320 L260 280 Z" />
-        
-        <!-- Inner star pattern -->
-        <path d="M300 260 L340 320 M340 280 L260 320 M300 340 L260 280" />
-        
-        <!-- Outer circles -->
-        <circle cx="300" cy="260" r="20" />
-        <circle cx="340" cy="280" r="20" />
-        <circle cx="340" cy="320" r="20" />
-        <circle cx="300" cy="340" r="20" />
-        <circle cx="260" cy="320" r="20" />
-        <circle cx="260" cy="280" r="20" />
-        
-        <!-- Outer connections -->
-        <path d="M300 240 L360 270 L360 330 L300 360 L240 330 L240 270 Z" />
-        
-        <!-- Surrounding decorative circles -->
-        <circle cx="300" cy="300" r="120" />
-        <circle cx="300" cy="300" r="180" />
-        <circle cx="300" cy="300" r="230" />
-      </g>
-      
-      <!-- Sri Yantra based pattern -->
-      <g id="sri-yantra" fill="none" stroke="white" stroke-width="0.5" opacity="0.08">
-        <!-- Center point -->
-        <circle cx="300" cy="300" r="5" fill="white" />
-        
-        <!-- Inner triangles -->
-        <path d="M300 250 L330 330 L270 330 Z" />
-        <path d="M300 350 L350 270 L250 270 Z" />
-        
-        <!-- Middle triangles -->
-        <path d="M300 230 L345 340 L255 340 Z" />
-        <path d="M300 370 L360 260 L240 260 Z" />
-        
-        <!-- Outer triangles -->
-        <path d="M300 210 L360 350 L240 350 Z" />
-        <path d="M300 390 L370 250 L230 250 Z" />
-        
-        <!-- Surrounding circles -->
-        <circle cx="300" cy="300" r="120" />
-        <circle cx="300" cy="300" r="190" />
-        <circle cx="300" cy="300" r="195" />
-      </g>
-    </svg>
+    <!-- Audio Controls -->
+    <div id="zen-audio-controls">
+      <svg id="audio-on" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+      </svg>
+      <svg id="audio-off" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:none;">
+        <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
+      </svg>
+    </div>
+    
+    <!-- Loading Screen -->
+    <div id="zen-loading">
+      <div class="loader"></div>
+      <div class="text">Creating Zen Space...</div>
+    </div>
+    
+    <!-- Chakra Info Template (will be cloned by JS) -->
+    <div id="chakra-info-template" class="chakra-info" style="display:none;">
+      <h3 id="chakra-name"></h3>
+      <p id="chakra-description"></p>
+    </div>
+    
+    <!-- Original cosmic background - hidden but kept for fallback -->
+    <div class="cosmic-background" aria-hidden="true" style="display: none;">
+        <!-- The stars-container will be added here by JS -->
+    </div>
     <main class="container">
         <div class="book-container" tabindex="0" role="button" aria-label="Interactive book. Click to open and enter zen world">
             <div class="book">
@@ -185,8 +76,229 @@
     <!-- Loading indicator -->
     <div class="loading-indicator" aria-label="Loading, please wait..."></div>
     
+    <!-- Three.js and other libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/postprocessing/6.23.4/postprocessing.min.js"></script>
+    
+    <!-- Project scripts -->
     <script src="js/script.js"></script>
     <script src="js/zen-elements.js"></script>
     <script src="js/enhanced-zen.js"></script>
+    <script src="js/webgl-zen.js"></script>
+    <script src="js/zen-audio.js"></script>
+    <script src="js/zen-debug.js"></script>
+    
+    <!-- Initialize WebGL Zen Space with robust error handling -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Set a loading timeout to prevent getting stuck
+        const LOADING_TIMEOUT = 8000; // 8 seconds
+        let loadingTimer = setTimeout(function() {
+          console.warn('Loading timeout reached - falling back to standard background');
+          handleLoadingFailure('Loading timeout');
+        }, LOADING_TIMEOUT);
+        
+        // Elements
+        const cosmicBackground = document.querySelector('.cosmic-background');
+        const bookContainer = document.querySelector('.book-container');
+        const loadingScreen = document.getElementById('zen-loading');
+        const audioControls = document.getElementById('zen-audio-controls');
+        const balanceIndicator = document.getElementById('balance-indicator');
+        const zenSpaceContainer = document.getElementById('zen-space-container');
+        
+        // Check WebGL compatibility
+        function isWebGLAvailable() {
+          try {
+            const canvas = document.createElement('canvas');
+            return !!(window.WebGLRenderingContext && 
+              (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+          } catch (e) {
+            console.error('WebGL check error:', e);
+            return false;
+          }
+        }
+        
+        // Handle loading failure
+        function handleLoadingFailure(reason) {
+          console.warn('Zen Space loading failed:', reason);
+          
+          // Clear timeout if it exists
+          if (loadingTimer) {
+            clearTimeout(loadingTimer);
+            loadingTimer = null;
+          }
+          
+          // Hide loading screen
+          if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+              loadingScreen.style.display = 'none';
+            }, 500);
+          }
+          
+          // Show DOM background as fallback
+          if (cosmicBackground) {
+            cosmicBackground.style.display = 'block';
+          }
+          
+          // Hide WebGL elements
+          if (audioControls) audioControls.style.display = 'none';
+          if (balanceIndicator) balanceIndicator.style.display = 'none';
+          if (zenSpaceContainer) zenSpaceContainer.style.display = 'none';
+          
+          // Show book container
+          if (bookContainer) {
+            bookContainer.style.opacity = '1';
+          }
+        }
+        
+        // Handle loading success
+        function handleLoadingSuccess() {
+          console.log('Zen Space loaded successfully');
+          
+          // Clear timeout
+          if (loadingTimer) {
+            clearTimeout(loadingTimer);
+            loadingTimer = null;
+          }
+          
+          // Fade out loading screen
+          if (loadingScreen) {
+            setTimeout(() => {
+              loadingScreen.style.opacity = '0';
+              setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                
+                // Show book container with fade-in
+                if (bookContainer) {
+                  bookContainer.style.transition = 'opacity 1.5s ease-in-out';
+                  bookContainer.style.opacity = '1';
+                }
+              }, 1000);
+            }, 2000); // Give it a bit more time to finish any async initializations
+          }
+        }
+        
+        // Initialize app
+        function initApp() {
+          // Add zen font if not already loaded
+          if (!document.querySelector('link[href*="Zen+Old+Mincho"]')) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://fonts.googleapis.com/css2?family=Zen+Old+Mincho&display=swap';
+            document.head.appendChild(link);
+          }
+          
+          // Hide DOM background
+          if (cosmicBackground) {
+            cosmicBackground.style.display = 'none';
+          }
+          
+          // Prepare book container for transition
+          if (bookContainer) {
+            bookContainer.style.opacity = '0';
+            bookContainer.style.transition = 'opacity 1.5s ease-in-out';
+          }
+          
+          // Check requirements
+          if (!window.THREE) {
+            return handleLoadingFailure('Three.js not loaded');
+          }
+          
+          if (!window.ZenSpace) {
+            return handleLoadingFailure('ZenSpace object not defined');
+          }
+          
+          if (!isWebGLAvailable()) {
+            return handleLoadingFailure('WebGL not supported');
+          }
+          
+          // Try initializing ZenSpace with error handling
+          try {
+            // Add chakra data
+            const chakraData = [
+              {
+                name: 'Root Chakra (Muladhara)',
+                color: '#ff0000',
+                description: 'Foundation and stability. Connects us to Earth and grounds our being.'
+              },
+              {
+                name: 'Sacral Chakra (Svadhisthana)',
+                color: '#ff7f00',
+                description: 'Creativity and emotion. Center of pleasure, joy, and our connection to others.'
+              },
+              {
+                name: 'Solar Plexus Chakra (Manipura)',
+                color: '#ffff00',
+                description: 'Personal power and will. Source of self-esteem, warrior energy, and autonomy.'
+              },
+              {
+                name: 'Heart Chakra (Anahata)',
+                color: '#00ff00',
+                description: 'Love and compassion. Bridge between lower and higher chakras, connecting mind and body.'
+              },
+              {
+                name: 'Throat Chakra (Vishuddha)',
+                color: '#0000ff',
+                description: 'Communication and expression. Enables us to speak our truth with clarity and confidence.'
+              },
+              {
+                name: 'Third Eye Chakra (Ajna)',
+                color: '#4b0082',
+                description: 'Intuition and wisdom. Center of insight, imagination and our ability to see beyond illusion.'
+              },
+              {
+                name: 'Crown Chakra (Sahasrara)',
+                color: '#9400d3',
+                description: 'Spirituality and consciousness. Connection to higher states of being and divine wisdom.'
+              }
+            ];
+            window.ZenSpace.chakraData = chakraData;
+            
+            // Initialize ZenSpace
+            const initResult = window.ZenSpace.init('zen-space-container');
+            if (!initResult) {
+              return handleLoadingFailure('ZenSpace initialization returned false');
+            }
+            
+            // Setup audio controls
+            if (audioControls) {
+              const audioOn = document.getElementById('audio-on');
+              const audioOff = document.getElementById('audio-off');
+              
+              audioControls.addEventListener('click', function() {
+                if (window.ZenSpace.audio.enabled) {
+                  // Disable audio
+                  window.ZenSpace.audio.enabled = false;
+                  audioOn.style.display = 'none';
+                  audioOff.style.display = 'block';
+                } else {
+                  // Enable audio
+                  window.ZenSpace.audio.enabled = true;
+                  audioOn.style.display = 'block';
+                  audioOff.style.display = 'none';
+                  
+                  // Initialize audio if not already done
+                  if (!window.ZenSpace.audio.initialized && window.ZenSpace.initAudio) {
+                    window.ZenSpace.initAudio();
+                  }
+                }
+              });
+            }
+            
+            // Mark as successful
+            handleLoadingSuccess();
+            
+          } catch (error) {
+            console.error('Error initializing ZenSpace:', error);
+            return handleLoadingFailure(error.message || 'Unknown error');
+          }
+        }
+        
+        // Start initialization
+        initApp();
+      });
+    </script>
 </body>
 </html>

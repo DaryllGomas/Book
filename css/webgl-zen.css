@@ -1,0 +1,168 @@
+/* WebGL Zen Space CSS */
+
+/* Zen space container */
+#zen-space-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -10;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Canvas styling */
+#zen-space-container canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -10;
+}
+
+/* Zen quote styling */
+.zen-quote {
+    position: fixed;
+    font-family: 'Zen Old Mincho', serif;
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    padding: 20px;
+    max-width: 80%;
+    top: 40%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    pointer-events: none;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    transition: opacity 4s, color 4s;
+}
+
+/* Loading overlay */
+#zen-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #050718;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 1.5s ease-out;
+}
+
+#zen-loading .loader {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: rgba(255, 215, 0, 0.7);
+    animation: spin 1.5s linear infinite;
+}
+
+#zen-loading .text {
+    margin-top: 20px;
+    color: rgba(255, 255, 255, 0.8);
+    font-family: 'Zen Old Mincho', serif;
+    font-size: 18px;
+    letter-spacing: 2px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Audio controls */
+#zen-audio-controls {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    z-index: 1000;
+}
+
+#zen-audio-controls:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+#zen-audio-controls svg {
+    width: 20px;
+    height: 20px;
+    fill: rgba(255, 255, 255, 0.7);
+}
+
+/* Chakra info popup */
+.chakra-info {
+    position: fixed;
+    background-color: rgba(10, 10, 30, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Zen Old Mincho', serif;
+    font-size: 14px;
+    max-width: 250px;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s, transform 0.3s;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.chakra-info.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.chakra-info h3 {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 5px;
+}
+
+.chakra-info p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Balance indicator - Yin Yang */
+#balance-indicator {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.7;
+    z-index: 1000;
+    pointer-events: none;
+    animation: pulsate 5s infinite alternate;
+}
+
+@keyframes pulsate {
+    0% {
+        opacity: 0.5;
+        transform: scale(0.95);
+    }
+    100% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
