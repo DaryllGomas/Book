@@ -1,0 +1,212 @@
+/* Enhanced Zen Elements CSS */
+
+/* Mandala enhancements */
+.mandala {
+    will-change: transform;
+    filter: blur(1px);
+    /* Increased opacity for more visibility */
+    opacity: 0.12 !important; 
+    /* Add subtle glow */
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.15);
+    /* Improve blend mode */
+    mix-blend-mode: soft-light;
+}
+
+/* Energy center enhancements */
+.energy-center {
+    will-change: transform, opacity;
+    /* Reduced blur for sharper appearance */
+    filter: blur(2px) !important; 
+    /* Stronger glow effect */
+    box-shadow: 0 0 30px currentColor;
+    /* Better blend mode */
+    mix-blend-mode: screen;
+}
+
+/* Create stronger energy centers */
+.energy-center-strong {
+    /* Larger size */
+    transform: scale(1.5) !important;
+    /* More intense glow */
+    filter: blur(3px) brightness(1.2) !important;
+    /* Higher base opacity */
+    opacity: 0.7 !important;
+}
+
+/* Wave enhancements */
+.wave {
+    /* More contrast in gradient */
+    background: repeating-linear-gradient(
+        90deg,
+        rgba(255,255,255,0.7) 0%,
+        rgba(255,255,255,0) 50%,
+        rgba(255,255,255,0.7) 100%
+    ) !important;
+    /* Improved blend mode */
+    mix-blend-mode: soft-light !important;
+    /* Higher opacity */
+    opacity: 0.2 !important;
+}
+
+/* Sacred geometry enhancements */
+.sacred-geometry {
+    will-change: opacity, transform;
+    /* Less blur for clearer patterns */
+    filter: blur(0.5px) !important;
+    /* Add subtle rotation */
+    animation: floatRotate 60s linear infinite !important;
+    /* Add subtle glow */
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+}
+
+/* New particle stream styling */
+.particle-stream-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: -3;
+}
+
+.particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    pointer-events: none;
+    will-change: transform, opacity;
+    /* Particle trail effect */
+    box-shadow: 0 0 3px 1px rgba(255, 255, 255, 0.3);
+}
+
+/* Energy connection styling */
+.energy-connection-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: -4;
+}
+
+.energy-connection {
+    position: absolute;
+    height: 1px;
+    background: linear-gradient(90deg, 
+        rgba(255,255,255,0) 0%, 
+        rgba(255,255,255,0.2) 50%, 
+        rgba(255,255,255,0) 100%);
+    opacity: 0;
+    pointer-events: none;
+    transform-origin: left center;
+    will-change: opacity, transform;
+}
+
+/* Synchronized pulsing animation */
+@keyframes syncPulse {
+    0%, 100% {
+        filter: brightness(0.8) blur(1px);
+        opacity: 0.7;
+    }
+    50% {
+        filter: brightness(1.5) blur(0.5px);
+        opacity: 1;
+    }
+}
+
+/* Floating rotation animation */
+@keyframes floatRotate {
+    0% {
+        transform: rotate(0deg) translateY(0px);
+    }
+    25% {
+        transform: rotate(90deg) translateY(5px);
+    }
+    50% {
+        transform: rotate(180deg) translateY(0px);
+    }
+    75% {
+        transform: rotate(270deg) translateY(-5px);
+    }
+    100% {
+        transform: rotate(360deg) translateY(0px);
+    }
+}
+
+/* Occasional flare animation */
+@keyframes elementFlare {
+    0%, 95%, 100% {
+        filter: brightness(1) blur(1px);
+        opacity: var(--base-opacity);
+    }
+    97% {
+        filter: brightness(2) blur(0.5px);
+        opacity: calc(var(--base-opacity) * 2);
+    }
+}
+
+/* Make sure all the zen elements don't interfere with interaction */
+.cosmic-background,
+.stars-container,
+.star,
+.mandala-container,
+.energy-centers-container,
+.harmonic-waves-container,
+.sacred-geometry-container,
+.particle-stream-container,
+.energy-connection-container,
+.mandala,
+.energy-center,
+.wave-layer,
+.wave,
+.sacred-geometry,
+.particle,
+.energy-connection {
+    pointer-events: none;
+}
+
+/* Updated z-index order */
+.cosmic-background { z-index: -10; }
+.stars-layer-1 { z-index: -9; }
+.stars-layer-2 { z-index: -8; }
+.stars-layer-3 { z-index: -7; }
+.stars-layer-4 { z-index: -6; }
+.sacred-geometry-container { z-index: -5; }
+.mandala-container { z-index: -4; }
+.energy-connection-container { z-index: -3; }
+.energy-centers-container { z-index: -2; }
+.particle-stream-container { z-index: -1; }
+.harmonic-waves-container { z-index: -1; }
+
+/* Ensure the book is on top */
+.book-container {
+    z-index: 10;
+    pointer-events: auto;
+}
+
+/* New animation for synchronized cosmic breathing */
+.cosmic-breathing {
+    animation: syncPulse 10s ease-in-out infinite;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+    .mandala, .sacred-geometry {
+        opacity: 0.1 !important;
+    }
+    
+    .energy-center {
+        filter: blur(1.5px) !important;
+    }
+    
+    .particle {
+        width: 1px;
+        height: 1px;
+    }
+}

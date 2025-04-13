@@ -15,6 +15,12 @@
   - [x] Energy centers with pulsing effect
   - [x] Harmonic waves flowing through space
   - [x] Sacred geometry patterns that fade in and out
+- [x] Enhance zen space elements:
+  - [x] Increase visual impact of all elements (higher contrast/visibility)
+  - [x] Add particle streams flowing toward the book
+  - [x] Create energy connections between energy centers
+  - [x] Add synchronized cosmic breathing effect
+  - [x] Add occasional cosmic flares
 
 ## Development
 - [x] Create HTML structure for landing page
