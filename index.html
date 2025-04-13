@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Enter Zen - Interactive book experience leading to zen stories and wisdom">
+    <title>Enter Zen From There</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- Preload images for better performance -->
+    <link rel="preload" href="assets/book2.png" as="image">
+    <!-- <link rel="preload" href="assets/cosmic.png" as="image"> -->
+</head>
+<body>
+    <div class="cosmic-background" aria-hidden="true">
+        <!-- Removed energy-wisps-container and its contents -->
+        <!-- The stars-container will be added here by JS -->
+    </div>
+    <main class="container">
+        <div class="book-container" tabindex="0" role="button" aria-label="Interactive book. Click to open and enter zen world">
+            <div class="book">
+                <div class="book-cover">
+                    <img src="assets/book2.png" alt="Zen Book Cover showing a path through a serene landscape">
+                    <div class="enter-text">Enter Zen</div>
+                </div>
+                <div class="book-page left-page"></div>
+                <div class="book-page right-page"></div>
+                <div class="book-spine"></div>
+                <div class="page-turning-effect"></div>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Help message for keyboard users -->
+    <div class="accessibility-help" aria-live="polite">
+        Press Enter or Space to open the book
+    </div>
+    
+    <!-- Loading indicator -->
+    <div class="loading-indicator" aria-label="Loading, please wait..."></div>
+    
+    <script src="js/script.js"></script>
+</body>
+</html>
