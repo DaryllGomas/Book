@@ -49,8 +49,8 @@
       <p id="chakra-description"></p>
     </div>
     
-    <!-- Original cosmic background - hidden but kept for fallback -->
-    <div class="cosmic-background" aria-hidden="true" style="display: none;">
+    <!-- Original cosmic background - display set to block to ensure it's visible -->
+    <div class="cosmic-background" aria-hidden="true" style="display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;">
         <!-- The stars-container will be added here by JS -->
     </div>
     <main class="container">
@@ -60,9 +60,26 @@
                     <img src="assets/book2.png" alt="Zen Book Cover showing a path through a serene landscape">
                     <div class="enter-text">Enter Zen</div>
                 </div>
-                <div class="book-page left-page"></div>
+                <div class="book-page left-page">
+                    <div class="ancient-text">
+                        <!-- Changed to <a> tags with direct href attributes -->
+                        <a href="https://daryllgomas.github.io/website/zen-story" class="ancient-section" id="enter-zen-section">
+                            <h2 class="ancient-title">Enter Zen</h2>
+                            <p class="ancient-description">Journey to the path of enlightenment</p>
+                            <div class="ancient-divider">⁂</div>
+                        </a>
+                        
+                        <a href="https://daryllgomas.github.io/Ancients/" class="ancient-section" id="ancients-section">
+                            <h2 class="ancient-title">Ancients</h2>
+                            <p class="ancient-description">Discover the wisdom of ancient civilizations</p>
+                            <div class="ancient-divider">⁂</div>
+                        </a>
+                        
+                        <h3 class="instruction-text">Click a section to explore</h3>
+                    </div>
+                </div>
                 <div class="book-page right-page"></div>
-                <div class="book-spine"></div>
+                <div class="book-spine" style="position: absolute; height: 100%; width: 3px; left: 0; top: 0; background-color: #7a5c3c; overflow: hidden; box-sizing: border-box; margin: 0; padding: 0; opacity: 0;"></div>
                 <div class="page-turning-effect"></div>
             </div>
         </div>
@@ -71,6 +88,13 @@
     <!-- Help message for keyboard users -->
     <div class="accessibility-help" aria-live="polite">
         Press Enter or Space to open the book
+    </div>
+
+    <!-- Destination Choice - now hidden since we're not using this approach -->
+    <div id="destination-choice" style="display: none; opacity: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 100; background: rgba(0,0,0,0.7); padding: 20px; border-radius: 10px; text-align: center;">
+        <h3 style="color: white; margin-bottom: 15px;">Where would you like to go?</h3>
+        <button id="goto-zen" style="margin: 5px; padding: 10px 15px; cursor: pointer;">Enter Zen Space</button>
+        <button id="goto-ancients" style="margin: 5px; padding: 10px 15px; cursor: pointer;">Explore Ancient History</button>
     </div>
     
     <!-- Loading indicator -->
@@ -92,213 +116,178 @@
     <!-- Initialize WebGL Zen Space with robust error handling -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        // Set a loading timeout to prevent getting stuck
-        const LOADING_TIMEOUT = 8000; // 8 seconds
-        let loadingTimer = setTimeout(function() {
-          console.warn('Loading timeout reached - falling back to standard background');
-          handleLoadingFailure('Loading timeout');
-        }, LOADING_TIMEOUT);
-        
-        // Elements
-        const cosmicBackground = document.querySelector('.cosmic-background');
+        // Key elements
         const bookContainer = document.querySelector('.book-container');
-        const loadingScreen = document.getElementById('zen-loading');
-        const audioControls = document.getElementById('zen-audio-controls');
-        const balanceIndicator = document.getElementById('balance-indicator');
-        const zenSpaceContainer = document.getElementById('zen-space-container');
+        const zenLoading = document.getElementById('zen-loading');
+        const leftPage = document.querySelector('.left-page');
+        const cosmicBackground = document.querySelector('.cosmic-background');
+        const enterZenSection = document.getElementById('enter-zen-section');
+        const ancientsSection = document.getElementById('ancients-section');
         
-        // Check WebGL compatibility
-        function isWebGLAvailable() {
-          try {
-            const canvas = document.createElement('canvas');
-            return !!(window.WebGLRenderingContext && 
-              (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
-          } catch (e) {
-            console.error('WebGL check error:', e);
-            return false;
-          }
-        }
-        
-        // Handle loading failure
-        function handleLoadingFailure(reason) {
-          console.warn('Zen Space loading failed:', reason);
-          
-          // Clear timeout if it exists
-          if (loadingTimer) {
-            clearTimeout(loadingTimer);
-            loadingTimer = null;
-          }
-          
-          // Hide loading screen
-          if (loadingScreen) {
-            loadingScreen.style.opacity = '0';
-            setTimeout(() => {
-              loadingScreen.style.display = 'none';
+        // Force close the loading screen after 5 seconds max
+        setTimeout(function() {
+          if (zenLoading) {
+            zenLoading.style.opacity = '0';
+            setTimeout(() => { 
+              zenLoading.style.display = 'none';
+              // Show book container immediately
+              if (bookContainer) {
+                bookContainer.style.display = 'block';
+                bookContainer.style.opacity = '1';
+              }
             }, 500);
           }
-          
-          // Show DOM background as fallback
-          if (cosmicBackground) {
-            cosmicBackground.style.display = 'block';
-          }
-          
-          // Hide WebGL elements
-          if (audioControls) audioControls.style.display = 'none';
-          if (balanceIndicator) balanceIndicator.style.display = 'none';
-          if (zenSpaceContainer) zenSpaceContainer.style.display = 'none';
-          
-          // Show book container
-          if (bookContainer) {
-            bookContainer.style.opacity = '1';
-          }
+        }, 5000);
+        
+        // Ensure cosmic background is visible
+        if (cosmicBackground) {
+          cosmicBackground.style.display = 'block';
         }
         
-        // Handle loading success
-        function handleLoadingSuccess() {
-          console.log('Zen Space loaded successfully');
-          
-          // Clear timeout
-          if (loadingTimer) {
-            clearTimeout(loadingTimer);
-            loadingTimer = null;
-          }
-          
-          // Fade out loading screen
-          if (loadingScreen) {
-            setTimeout(() => {
-              loadingScreen.style.opacity = '0';
-              setTimeout(() => {
-                loadingScreen.style.display = 'none';
-                
-                // Show book container with fade-in
-                if (bookContainer) {
-                  bookContainer.style.transition = 'opacity 1.5s ease-in-out';
-                  bookContainer.style.opacity = '1';
-                }
-              }, 1000);
-            }, 2000); // Give it a bit more time to finish any async initializations
-          }
+        // Backup approach for links - add direct click handling on the sections
+        if (enterZenSection) {
+          enterZenSection.onclick = function(e) {
+            window.location.href = 'https://daryllgomas.github.io/website/zen-story';
+            return false; // Prevent default and stop propagation
+          };
         }
         
-        // Initialize app
-        function initApp() {
-          // Add zen font if not already loaded
-          if (!document.querySelector('link[href*="Zen+Old+Mincho"]')) {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'https://fonts.googleapis.com/css2?family=Zen+Old+Mincho&display=swap';
-            document.head.appendChild(link);
-          }
-          
-          // Hide DOM background
-          if (cosmicBackground) {
-            cosmicBackground.style.display = 'none';
-          }
-          
-          // Prepare book container for transition
-          if (bookContainer) {
-            bookContainer.style.opacity = '0';
-            bookContainer.style.transition = 'opacity 1.5s ease-in-out';
-          }
-          
-          // Check requirements
-          if (!window.THREE) {
-            return handleLoadingFailure('Three.js not loaded');
-          }
-          
-          if (!window.ZenSpace) {
-            return handleLoadingFailure('ZenSpace object not defined');
-          }
-          
-          if (!isWebGLAvailable()) {
-            return handleLoadingFailure('WebGL not supported');
-          }
-          
-          // Try initializing ZenSpace with error handling
-          try {
-            // Add chakra data
-            const chakraData = [
-              {
-                name: 'Root Chakra (Muladhara)',
-                color: '#ff0000',
-                description: 'Foundation and stability. Connects us to Earth and grounds our being.'
-              },
-              {
-                name: 'Sacral Chakra (Svadhisthana)',
-                color: '#ff7f00',
-                description: 'Creativity and emotion. Center of pleasure, joy, and our connection to others.'
-              },
-              {
-                name: 'Solar Plexus Chakra (Manipura)',
-                color: '#ffff00',
-                description: 'Personal power and will. Source of self-esteem, warrior energy, and autonomy.'
-              },
-              {
-                name: 'Heart Chakra (Anahata)',
-                color: '#00ff00',
-                description: 'Love and compassion. Bridge between lower and higher chakras, connecting mind and body.'
-              },
-              {
-                name: 'Throat Chakra (Vishuddha)',
-                color: '#0000ff',
-                description: 'Communication and expression. Enables us to speak our truth with clarity and confidence.'
-              },
-              {
-                name: 'Third Eye Chakra (Ajna)',
-                color: '#4b0082',
-                description: 'Intuition and wisdom. Center of insight, imagination and our ability to see beyond illusion.'
-              },
-              {
-                name: 'Crown Chakra (Sahasrara)',
-                color: '#9400d3',
-                description: 'Spirituality and consciousness. Connection to higher states of being and divine wisdom.'
-              }
-            ];
-            window.ZenSpace.chakraData = chakraData;
-            
-            // Initialize ZenSpace
-            const initResult = window.ZenSpace.init('zen-space-container');
-            if (!initResult) {
-              return handleLoadingFailure('ZenSpace initialization returned false');
+        if (ancientsSection) {
+          ancientsSection.onclick = function(e) {
+            window.location.href = 'https://daryllgomas.github.io/Ancients/';
+            return false; // Prevent default and stop propagation
+          };
+        }
+        
+        // Also add click handler to the whole book page to ensure navigation works
+        if (leftPage) {
+          leftPage.addEventListener('click', function(e) {
+            // Check if the click happened inside enter-zen-section
+            if (e.target.closest('#enter-zen-section')) {
+              window.location.href = 'https://daryllgomas.github.io/website/zen-story';
+              e.preventDefault();
+              e.stopPropagation();
+            } 
+            // Check if the click happened inside ancients-section
+            else if (e.target.closest('#ancients-section')) {
+              window.location.href = 'https://daryllgomas.github.io/Ancients/';
+              e.preventDefault();
+              e.stopPropagation();
             }
-            
-            // Setup audio controls
-            if (audioControls) {
-              const audioOn = document.getElementById('audio-on');
-              const audioOff = document.getElementById('audio-off');
-              
-              audioControls.addEventListener('click', function() {
-                if (window.ZenSpace.audio.enabled) {
-                  // Disable audio
-                  window.ZenSpace.audio.enabled = false;
-                  audioOn.style.display = 'none';
-                  audioOff.style.display = 'block';
-                } else {
-                  // Enable audio
-                  window.ZenSpace.audio.enabled = true;
-                  audioOn.style.display = 'block';
-                  audioOff.style.display = 'none';
-                  
-                  // Initialize audio if not already done
-                  if (!window.ZenSpace.audio.initialized && window.ZenSpace.initAudio) {
-                    window.ZenSpace.initAudio();
-                  }
-                }
-              });
-            }
-            
-            // Mark as successful
-            handleLoadingSuccess();
-            
-          } catch (error) {
-            console.error('Error initializing ZenSpace:', error);
-            return handleLoadingFailure(error.message || 'Unknown error');
-          }
+          });
         }
         
-        // Start initialization
-        initApp();
+        // Load ancient-looking fonts
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://fonts.googleapis.com/css2?family=Cinzel&family=Cinzel+Decorative&display=swap';
+        document.head.appendChild(link);
       });
     </script>
+    <style>
+        /* Add styles for ancient text */
+        .ancient-text {
+            padding: 20px;
+            text-align: center;
+            color: #3a2c18;
+            font-family: 'Cinzel', 'Times New Roman', serif;
+        }
+        
+        .book-page {
+            background-color: #f8f3e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            /* Add paper texture to all book pages */
+            background-image: url('data:image/png;base64,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');
+        }
+        
+        .ancient-section {
+            margin: 15px 0;
+            padding: 10px;
+            border: 1px solid rgba(139, 69, 19, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            z-index: 100; /* Ensure it's above other elements */
+        }
+        
+        .ancient-section:hover {
+            background-color: rgba(139, 69, 19, 0.1);
+            transform: scale(1.02);
+            border-color: rgba(139, 69, 19, 0.7);
+        }
+        
+        .ancient-title {
+            font-family: 'Cinzel Decorative', 'Cinzel', serif;
+            font-size: 24px;
+            margin: 5px 0;
+            letter-spacing: 1px;
+        }
+        
+        .ancient-description {
+            font-style: italic;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+        
+        .ancient-divider {
+            font-size: 20px;
+            color: #8B4513;
+            margin: 5px 0;
+        }
+        
+        .instruction-text {
+            font-family: serif;
+            margin-top: 20px;
+            font-size: 16px;
+            font-style: italic;
+            color: #5d4937;
+        }
+        
+        .left-page {
+            position: relative;
+        }
+        
+        .left-page:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: transparent;
+            z-index: 1; /* Lower z-index so section clicks work */
+        }
+        
+        /* Fix for book spine visual bug */
+        .book-spine {
+            position: absolute;
+            height: 100%;
+            width: 3px; /* Very thin spine */
+            left: 0;
+            top: 0;
+            background-color: #7a5c3c;
+            /* Hide any overflow */
+            overflow: hidden;
+            /* Make sure it doesn't exceed container */
+            box-sizing: border-box;
+            /* Ensure it doesn't create unwanted spacing */
+            margin: 0;
+            padding: 0;
+            /* Hide it when book is closed (will be visible on open) */
+            opacity: 0;
+        }
+        
+        /* Hide any other potential lines */
+        .book {
+            position: relative;
+            overflow: hidden; /* Hide any overflow */
+        }
+    </style>
 </body>
 </html>

@@ -132,19 +132,26 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Book cover computed transform:', computedStyle.transform);
         }, 100);
         
-        // After book opens, start fade out animation and redirect
+        // After book opens, start fade out animation 
         setTimeout(function() {
-            console.log('Adding fade-out class to container');
-            elements.container.classList.add('fade-out');
+            console.log('Adding fade-out class to container - DISABLED');
+            // DISABLED: elements.container.classList.add('fade-out');
             
-            // Show loading indicator
-            elements.loadingIndicator.classList.add('active');
+            // DISABLED: Show loading indicator
+            // elements.loadingIndicator.classList.add('active');
             
-            // Redirect to the target page after animations complete
+            // Dispatch a custom event to signal the book has opened
+            const bookOpenedEvent = new CustomEvent('bookOpened');
+            document.dispatchEvent(bookOpenedEvent);
+            console.log('Dispatched bookOpened event');
+            
+            // REMOVED automatic redirection - using choice menu instead
+            /*
             setTimeout(function() {
                 console.log('Redirecting to:', config.targetUrl);
                 window.location.href = config.targetUrl;
-            }, config.animationDuration);
+            }, 1000);
+            */
         }, config.animationDuration);
     }
     
