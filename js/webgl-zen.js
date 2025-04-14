@@ -58,22 +58,31 @@ const ZenSpace = {
   // Configuration
   config: {
     particleCount: {
-      stars: 2000,
-      energyStream: 500,
-      floatingParticles: 300
+      stars: 3000,          // INCREASED from 2000 for more stars
+      energyStream: 800,    // INCREASED from 500 for denser streams
+      floatingParticles: 500 // INCREASED from 300
+    },
+    portal: {
+      radius: 25,
+      depth: 50,
+      segments: 64,
+      rings: 8,
+      speed: 0.2
     },
     colors: {
-      background: new THREE.Color(0x050718),
+      background: new THREE.Color(0x030412), // DARKENED for more contrast
       nebula: {
-        primary: new THREE.Color(0x0a0a2a),
-        secondary: new THREE.Color(0x1a102a),
-        accent: new THREE.Color(0x4a1a4a)
+        primary: new THREE.Color(0x0c0c3a),   // ENHANCED saturation
+        secondary: new THREE.Color(0x220f3a), // ENHANCED saturation
+        accent: new THREE.Color(0x6a1a6a)     // ENHANCED saturation
       },
       stars: [
         new THREE.Color(0xffffff),
         new THREE.Color(0xeeeeff),
         new THREE.Color(0xffffee),
-        new THREE.Color(0xeeffff)
+        new THREE.Color(0xeeffff),
+        new THREE.Color(0xffeeee),  // ADDED more star colors
+        new THREE.Color(0xeeffee)   // ADDED more star colors
       ],
       energy: [
         new THREE.Color(0x88aaff), // Blue
@@ -93,13 +102,13 @@ const ZenSpace = {
       ]
     },
     fog: {
-      color: new THREE.Color(0x050718),
-      density: 0.0015
+      color: new THREE.Color(0x030412), // DARKENED to match background
+      density: 0.001                    // DECREASED for more clarity
     },
     bloom: {
-      strength: 1.5,
-      radius: 0.75,
-      threshold: 0.2
+      strength: 2.5,   // INCREASED from 1.5
+      radius: 0.85,    // INCREASED from 0.75
+      threshold: 0.15  // DECREASED from 0.2 to make more elements glow
     }
   },
   
@@ -107,7 +116,14 @@ const ZenSpace = {
   shaders: {
     nebula: null,
     energyStream: null,
-    mandala: null
+    mandala: null,
+    portal: null
+  },
+  
+  // Portal effect
+  portal: {
+    mesh: null,
+    target: new THREE.Vector3(0, 0, -40)
   },
   
   // Zen quotes that will appear occasionally
@@ -147,6 +163,7 @@ const ZenSpace = {
     this.addEventListeners();
     
     // Create scene elements
+    this.createPortal(); // Add portal effect first (at the back)
     this.createNebula();
     this.createStars();
     this.createEnergyStreams();
@@ -272,9 +289,9 @@ const ZenSpace = {
     this.interaction.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     this.interaction.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
     
-    // Slight camera movement based on mouse position
-    const camMovementX = this.interaction.mouse.x * 2;
-    const camMovementY = this.interaction.mouse.y * 2;
+    // Enhanced camera movement based on mouse position
+    const camMovementX = this.interaction.mouse.x * 3; // INCREASED from 2
+    const camMovementY = this.interaction.mouse.y * 3; // INCREASED from 2
     
     // Smoothly move camera
     gsap.to(this.camera.position, {
@@ -283,6 +300,26 @@ const ZenSpace = {
       duration: 2,
       ease: 'power2.out'
     });
+    
+    // Move portal based on mouse (more subtle effect for depth parallax)
+    if (this.portal.mesh) {
+      gsap.to(this.portal.mesh.position, {
+        x: this.interaction.mouse.x * -1.5, // Inverse movement for parallax
+        y: this.interaction.mouse.y * -1.5, // Inverse movement for parallax
+        duration: 2,
+        ease: 'power2.out'
+      });
+      
+      // Also move the portal light
+      if (this.portal.light) {
+        gsap.to(this.portal.light.position, {
+          x: this.portal.target.x + this.interaction.mouse.x * -2,
+          y: this.portal.target.y + this.interaction.mouse.y * -2,
+          duration: 2,
+          ease: 'power2.out'
+        });
+      }
+    }
   },
   
   // Handle mouse click
@@ -291,7 +328,148 @@ const ZenSpace = {
     this.createRipple(event.clientX, event.clientY);
   },
   
-  // Create cosmic nebula background
+  // Create cosmic portal effect
+  createPortal: function() {
+    // Create geometry for the portal rings
+    const geometry = new THREE.TorusGeometry(
+      this.config.portal.radius,
+      0.5,
+      this.config.portal.segments,
+      this.config.portal.segments
+    );
+    
+    // Create shader material for the portal
+    const material = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+        uDepth: { value: this.config.portal.depth },
+        uRings: { value: this.config.portal.rings },
+        uColor1: { value: new THREE.Color(0x8800ff) },  // Deep purple
+        uColor2: { value: new THREE.Color(0x0088ff) },  // Bright blue
+        uPortalRadius: { value: this.config.portal.radius }
+      },
+      vertexShader: `
+        uniform float uTime;
+        uniform float uDepth;
+        uniform float uRings;
+        
+        varying vec2 vUv;
+        varying float vDepth;
+        varying float vRingIndex;
+        
+        void main() {
+          vUv = uv;
+          
+          // Calculate ring index based on instance id
+          vRingIndex = float(gl_InstanceID);
+          
+          // Calculate depth based on ring index
+          vDepth = vRingIndex / (uRings - 1.0);
+          
+          // Position the ring in 3D space based on its depth
+          vec3 pos = position;
+          
+          // Scale down rings as they go deeper
+          float scale = 1.0 - (vDepth * 0.7);
+          pos *= scale;
+          
+          // Move rings along z-axis based on depth
+          float z = -vDepth * uDepth;
+          
+          // Add some movement based on time
+          float movementSpeed = uTime * (0.2 + vDepth * 0.8); // Faster movement for deeper rings
+          z -= mod(movementSpeed, uDepth);
+          
+          // Final position
+          vec4 modelPosition = modelMatrix * vec4(pos.x, pos.y, z, 1.0);
+          vec4 viewPosition = viewMatrix * modelPosition;
+          vec4 projectedPosition = projectionMatrix * viewPosition;
+          
+          gl_Position = projectedPosition;
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uColor1;
+        uniform vec3 uColor2;
+        uniform float uPortalRadius;
+        
+        varying vec2 vUv;
+        varying float vDepth;
+        varying float vRingIndex;
+        
+        void main() {
+          // Create a glowing effect based on depth
+          float glow = 1.0 - vDepth;
+          
+          // Pulse effect
+          float pulse = 0.5 + 0.5 * sin(uTime * 0.5 + vRingIndex * 0.2);
+          glow *= (0.7 + 0.3 * pulse);
+          
+          // Mix colors based on depth and time
+          float colorMix = sin(uTime * 0.2 + vDepth * 3.14) * 0.5 + 0.5;
+          vec3 color = mix(uColor1, uColor2, colorMix);
+          
+          // Apply glow to color
+          color *= glow * 1.5;
+          
+          // Create ring shape
+          float ring = 0.5 - abs(vUv.y - 0.5);
+          ring = smoothstep(0.0, 0.5, ring);
+          
+          // Final alpha with pulse effect
+          float alpha = ring * glow * (0.5 + 0.5 * pulse);
+          
+          // Output final color
+          gl_FragColor = vec4(color, alpha);
+        }
+      `,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide
+    });
+    
+    // Store shader material for updates
+    this.shaders.portal = material;
+    
+    // Create instanced mesh for efficient rendering of multiple rings
+    const mesh = new THREE.InstancedMesh(
+      geometry,
+      material,
+      this.config.portal.rings
+    );
+    
+    // Set instance matrix for each ring
+    const matrix = new THREE.Matrix4();
+    for (let i = 0; i < this.config.portal.rings; i++) {
+      mesh.setMatrixAt(i, matrix);
+    }
+    
+    // Position the portal
+    mesh.position.copy(this.portal.target);
+    
+    // Add to scene
+    this.scene.add(mesh);
+    
+    // Store reference to mesh
+    this.portal.mesh = mesh;
+    
+    // Create a point light at the center of the portal
+    const portalLight = new THREE.PointLight(
+      new THREE.Color(0x6633ff), // Purple light
+      1.0,  // Intensity
+      80    // Distance
+    );
+    portalLight.position.copy(this.portal.target);
+    this.scene.add(portalLight);
+    
+    // Store light with portal
+    this.portal.light = portalLight;
+  },
+  
+  // Create cosmic nebula background with portal effect
   createNebula: function() {
     // Create geometry (simple plane that fills view)
     const geometry = new THREE.PlaneGeometry(100, 100, 1, 1);
@@ -303,7 +481,8 @@ const ZenSpace = {
         uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
         uColorPrimary: { value: this.config.colors.nebula.primary },
         uColorSecondary: { value: this.config.colors.nebula.secondary },
-        uColorAccent: { value: this.config.colors.nebula.accent }
+        uColorAccent: { value: this.config.colors.nebula.accent },
+        uMouse: { value: new THREE.Vector2(0.5, 0.5) } // For portal interaction
       },
       vertexShader: `
         varying vec2 vUv;
@@ -399,18 +578,21 @@ const ZenSpace = {
           vec2 p = (gl_FragCoord.xy / uResolution.xy) * 2.0 - 1.0;
           p.x *= uResolution.x / uResolution.y;
           
-          // Create base color from nebula colors
-          float nebulaNoise = snoise(vec3(p * 1.5, uTime * 0.05)) * 0.5 + 0.5;
-          float nebulaNoiseSmall = snoise(vec3(p * 5.0, uTime * 0.03)) * 0.5 + 0.5;
+          // ENHANCED: Create more dynamic base color from nebula colors with faster time
+          float nebulaNoise = snoise(vec3(p * 1.8, uTime * 0.08)) * 0.5 + 0.5; // Increased scale and speed
+          float nebulaNoiseSmall = snoise(vec3(p * 6.0, uTime * 0.05)) * 0.5 + 0.5; // Increased scale and speed
           
-          // Mix colors based on noise
+          // ENHANCED: Mix colors with more contrast
           vec3 color = mix(uColorPrimary, uColorSecondary, nebulaNoise);
-          color = mix(color, uColorAccent, nebulaNoiseSmall * 0.3);
+          color = mix(color, uColorAccent, nebulaNoiseSmall * 0.5); // Increased from 0.3
           
-          // Add some depth with vignette effect
-          float vignette = 1.0 - length(p * 0.7);
-          vignette = smoothstep(0.0, 1.0, vignette);
-          color *= vignette * 1.5;
+          // ENHANCED: Add some depth with stronger vignette effect
+          float vignette = 1.0 - length(p * 0.8); // Increased from 0.7
+          vignette = pow(smoothstep(0.0, 1.0, vignette), 1.5); // Added pow for more pronounced effect
+          color *= vignette * 2.0; // Increased from 1.5
+          
+          // ENHANCED: Add subtle color pulsing over time
+          color *= 1.0 + 0.2 * sin(uTime * 0.2); // Add subtle breathing effect to the entire nebula
           
           // Output final color
           gl_FragColor = vec4(color, 1.0);
@@ -451,8 +633,8 @@ const ZenSpace = {
       positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);   // y
       positions[i * 3 + 2] = radius * Math.cos(phi) - 40;                // z (pull back to be behind nebula)
       
-      // Size - random between 0.1 and 1.0
-      sizes[i] = 0.1 + Math.random() * 0.9;
+      // ENHANCED: Size - random between 0.1 and 1.5 (increased from 0.9)
+      sizes[i] = 0.1 + Math.random() * 1.5;
       
       // Color - select from star colors
       const colorIndex = Math.floor(Math.random() * this.config.colors.stars.length);
@@ -461,8 +643,8 @@ const ZenSpace = {
       colors[i * 3 + 1] = color.g; // g
       colors[i * 3 + 2] = color.b; // b
       
-      // Opacity - random between 0.2 and 1.0
-      opacities[i] = 0.2 + Math.random() * 0.8;
+      // ENHANCED: Opacity - random between 0.3 and 1.0 (increased from 0.2)
+      opacities[i] = 0.3 + Math.random() * 0.7;
     }
     
     // Set attributes for geometry
@@ -476,7 +658,7 @@ const ZenSpace = {
       uniforms: {
         uTime: { value: 0 },
         uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
-        uSize: { value: 200 }
+        uSize: { value: 350 } // INCREASED from 200 for larger stars
       },
       vertexShader: `
         uniform float uTime;
@@ -494,11 +676,11 @@ const ZenSpace = {
           // Position
           vec4 modelPosition = modelMatrix * vec4(position, 1.0);
           
-          // Add subtle movement to stars
-          float angle = uTime * 0.05;
-          float amplitude = 0.1;
-          modelPosition.x += sin(uTime * 0.1 + position.z * 0.5) * amplitude;
-          modelPosition.y += cos(uTime * 0.1 + position.x * 0.5) * amplitude;
+          // ENHANCED: Add more pronounced movement to stars
+          float angle = uTime * 0.08; // Increased from 0.05
+          float amplitude = 0.2; // Increased from 0.1
+          modelPosition.x += sin(uTime * 0.15 + position.z * 0.5) * amplitude; // Increased speed
+          modelPosition.y += cos(uTime * 0.15 + position.x * 0.5) * amplitude; // Increased speed
           
           vec4 viewPosition = viewMatrix * modelPosition;
           vec4 projectedPosition = projectionMatrix * viewPosition;
@@ -511,9 +693,9 @@ const ZenSpace = {
           // Pass data to fragment shader
           vColor = color;
           
-          // Animate opacity based on time for twinkling
-          float twinkle = sin(uTime * (1.0 + size) + position.x * 100.0) * 0.5 + 0.5;
-          vOpacity = opacity * (0.6 + twinkle * 0.4);
+          // ENHANCED: Animate opacity based on time for more dramatic twinkling
+          float twinkle = sin(uTime * (1.5 + size) + position.x * 100.0) * 0.5 + 0.5; // Increased speed
+          vOpacity = opacity * (0.5 + twinkle * 0.5); // More pronounced effect (0.5 to 1.0 range)
         }
       `,
       fragmentShader: `
@@ -527,11 +709,11 @@ const ZenSpace = {
           // Create circle shape with soft edge
           float strength = smoothstep(0.5, 0.0, distanceToCenter);
           
-          // Star glow
-          vec3 color = vColor;
+          // ENHANCED: Star glow with more brightness
+          vec3 color = vColor * 1.2; // Increased brightness
           
-          // Apply radial fade for glow effect
-          float glow = exp(-distanceToCenter * 4.0);
+          // ENHANCED: Apply stronger radial fade for more pronounced glow effect
+          float glow = exp(-distanceToCenter * 3.0); // Decreased from 4.0 for wider glow
           
           // Output final color
           gl_FragColor = vec4(color, vOpacity * strength * glow);
@@ -551,12 +733,14 @@ const ZenSpace = {
   
   // Create energy streams
   createEnergyStreams: function() {
-    // Create 4 energy streams from different directions
+    // ENHANCED: Create 6 energy streams instead of 4
     const streamDirections = [
       { x: -40, y: 20, z: -20 },   // Top left
       { x: 40, y: 20, z: -20 },    // Top right
       { x: 40, y: -20, z: -20 },   // Bottom right
-      { x: -40, y: -20, z: -20 }   // Bottom left
+      { x: -40, y: -20, z: -20 },  // Bottom left
+      { x: 0, y: 35, z: -20 },     // Top center (NEW)
+      { x: 0, y: -35, z: -20 }     // Bottom center (NEW)
     ];
     
     // Target is center of scene where book is
@@ -619,14 +803,14 @@ const ZenSpace = {
       const y = Math.pow(1 - t, 2) * p0.y + 2 * (1 - t) * t * p1.y + Math.pow(t, 2) * p2.y;
       const z = Math.pow(1 - t, 2) * p0.z + 2 * (1 - t) * t * p1.z + Math.pow(t, 2) * p2.z;
       
-      // Add some randomness to spread particles around the path
-      const spread = 2 * (1 - Math.pow(t, 0.5)); // More spread at start, less at end
+      // ENHANCED: Reduce spread for a more focused stream
+      const spread = 1.8 * (1 - Math.pow(t, 0.5)); // Decreased from 2.0
       positions[i * 3] = x + (Math.random() - 0.5) * spread;
       positions[i * 3 + 1] = y + (Math.random() - 0.5) * spread;
       positions[i * 3 + 2] = z + (Math.random() - 0.5) * spread;
       
-      // Random size - smaller near start, larger near end
-      sizes[i] = 0.1 + Math.pow(t, 2) * 0.9;
+      // ENHANCED: Size - larger particles overall
+      sizes[i] = 0.2 + Math.pow(t, 2) * 1.2; // Increased from 0.1 and 0.9
       
       // Random value for animation
       randoms[i] = Math.random();
@@ -643,9 +827,9 @@ const ZenSpace = {
       uniforms: {
         uTime: { value: 0 },
         uPixelRatio: { value: Math.min(window.devicePixelRatio, 2) },
-        uSize: { value: 100 },
+        uSize: { value: 150 },  // INCREASED from 100
         uColor: { value: color },
-        uSpeed: { value: 0.2 + Math.random() * 0.1 }
+        uSpeed: { value: 0.3 + Math.random() * 0.1 } // INCREASED from 0.2
       },
       vertexShader: `
         uniform float uTime;
@@ -683,19 +867,19 @@ const ZenSpace = {
           // Calculate distance from center
           float distanceToCenter = length(gl_PointCoord - vec2(0.5));
           
-          // Create soft circle shape
-          float strength = smoothstep(0.5, 0.0, distanceToCenter);
+          // ENHANCED: Create softer circle shape with wider glow
+          float strength = smoothstep(0.5, 0.1, distanceToCenter); // Changed from 0.0 to 0.1
           
-          // Create tail effect based on progress
-          float tail = smoothstep(0.0, 0.8, vProgress) * smoothstep(1.0, 0.8, vProgress);
+          // ENHANCED: Create more pronounced tail effect based on progress
+          float tail = smoothstep(0.0, 0.7, vProgress) * smoothstep(1.0, 0.7, vProgress); // Changed from 0.8
           
-          // Combine for final color
-          vec3 color = uColor;
-          float alpha = strength * tail;
+          // ENHANCED: Combine for final color with higher intensity
+          vec3 color = uColor * 1.3; // Increased brightness
+          float alpha = strength * tail * 1.2; // Increased from 1.0
           
-          // Additional glow for head of particle
-          float headGlow = smoothstep(0.8, 1.0, vProgress) * 2.0;
-          alpha += headGlow * strength * 0.5;
+          // ENHANCED: Additional glow for head of particle
+          float headGlow = smoothstep(0.8, 1.0, vProgress) * 3.0; // Increased from 2.0
+          alpha += headGlow * strength * 0.7; // Increased from 0.5
           
           // Discard transparent pixels
           if (alpha < 0.01) discard;
@@ -736,17 +920,19 @@ const ZenSpace = {
   
   // Create 3D mandala elements
   createMandalas: function() {
-    // Mandala positions around the scene
+    // ENHANCED: More mandala positions around the scene
     const positions = [
       { x: -30, y: 15, z: -15 },
       { x: 30, y: 20, z: -20 },
-      { x: 5, y: -25, z: -10 }
+      { x: 5, y: -25, z: -10 },
+      { x: -25, y: -5, z: -12 }, // NEW
+      { x: 25, y: 5, z: -18 }    // NEW
     ];
     
     // Create each mandala
     positions.forEach((position, index) => {
-      // Create geometry (simple circle with lots of segments)
-      const radius = 2 + Math.random() * 3;
+      // ENHANCED: Create larger mandala circles
+      const radius = 3 + Math.random() * 4; // Increased from 2 + random * 3
       const geometry = new THREE.CircleGeometry(radius, 32);
       
       // Create shader material
@@ -755,7 +941,7 @@ const ZenSpace = {
           uTime: { value: 0 },
           uTexture: { value: this.getRandomMandalaTexture() },
           uColor: { value: this.config.colors.energy[index % this.config.colors.energy.length] },
-          uOpacity: { value: 0.2 + Math.random() * 0.3 }
+          uOpacity: { value: 0.4 + Math.random() * 0.3 } // INCREASED from 0.2
         },
         vertexShader: `
           varying vec2 vUv;
@@ -778,8 +964,8 @@ const ZenSpace = {
             vec2 centeredUv = vUv - 0.5;
             float distanceToCenter = length(centeredUv);
             
-            // Rotate texture coordinates based on time
-            float angle = uTime * 0.1;
+            // ENHANCED: Rotate texture coordinates based on time with faster rotation
+            float angle = uTime * 0.15; // Increased from 0.1
             vec2 rotatedUv = vec2(
               centeredUv.x * cos(angle) - centeredUv.y * sin(angle),
               centeredUv.x * sin(angle) + centeredUv.y * cos(angle)
@@ -789,14 +975,14 @@ const ZenSpace = {
             vec4 texColor = texture2D(uTexture, rotatedUv);
             
             // Create edge fade
-            float fade = smoothstep(1.0, 0.8, distanceToCenter * 2.0);
+            float fade = smoothstep(1.0, 0.7, distanceToCenter * 2.0); // Changed from 0.8
             
-            // Animate opacity
-            float pulseOpacity = uOpacity * (0.8 + 0.2 * sin(uTime * 0.2 + distanceToCenter * 10.0));
+            // ENHANCED: Animate opacity with more pronounced pulsing
+            float pulseOpacity = uOpacity * (0.7 + 0.3 * sin(uTime * 0.3 + distanceToCenter * 12.0)); // Increased effect
             
-            // Combine for final color
-            vec3 color = uColor * texColor.rgb;
-            float alpha = texColor.a * fade * pulseOpacity;
+            // ENHANCED: Combine for final color with higher intensity
+            vec3 color = uColor * texColor.rgb * 1.3; // Increased brightness
+            float alpha = texColor.a * fade * pulseOpacity * 1.2; // Increased visibility
             
             // Output final color
             gl_FragColor = vec4(color, alpha);
@@ -817,11 +1003,11 @@ const ZenSpace = {
       // Random rotation
       mandala.rotation.z = Math.random() * Math.PI * 2;
       
-      // Store rotation speed for animation
+      // ENHANCED: More varied animation speeds
       mandala.userData = {
-        rotationSpeed: 0.01 + Math.random() * 0.03,
+        rotationSpeed: 0.015 + Math.random() * 0.035, // Increased from 0.01 + random * 0.03
         floatSpeed: 0.2 + Math.random() * 0.3,
-        floatAmplitude: 0.2 + Math.random() * 0.3
+        floatAmplitude: 0.3 + Math.random() * 0.4 // Increased from 0.2 + random * 0.3
       };
       
       // Add to mandalas array
@@ -852,8 +1038,8 @@ const ZenSpace = {
       const colorIndex = index % this.config.colors.chakra.length;
       const color = this.config.colors.chakra[colorIndex];
       
-      // Create geometry (sphere for energy center)
-      const radius = index === 0 ? 1.5 : 0.5 + Math.random() * 0.5;
+      // ENHANCED: Create larger energy centers
+      const radius = index === 0 ? 2.0 : 0.8 + Math.random() * 0.7; // Increased from 1.5 and 0.5
       const geometry = new THREE.SphereGeometry(radius, 16, 16);
       
       // Create material
@@ -861,7 +1047,7 @@ const ZenSpace = {
         uniforms: {
           uTime: { value: 0 },
           uColor: { value: color },
-          uIntensity: { value: index === 0 ? 1.0 : 0.6 + Math.random() * 0.4 }
+          uIntensity: { value: index === 0 ? 1.3 : 0.8 + Math.random() * 0.5 } // Increased from 1.0 and 0.6
         },
         vertexShader: `
           varying vec3 vNormal;
@@ -882,16 +1068,16 @@ const ZenSpace = {
           varying vec3 vPosition;
           
           void main() {
-            // Edge glow effect
+            // ENHANCED: Stronger edge glow effect
             float rim = 1.0 - max(0.0, dot(normalize(vNormal), normalize(-vPosition)));
-            rim = pow(rim, 2.0) * 2.0;
+            rim = pow(rim, 1.7) * 2.5; // Changed from 2.0 and 2.0
             
-            // Pulse effect
-            float pulse = (0.5 + 0.5 * sin(uTime * 0.5)) * uIntensity;
+            // ENHANCED: More pronounced pulse effect
+            float pulse = (0.5 + 0.5 * sin(uTime * 0.6)) * uIntensity; // Increased from 0.5
             
-            // Combine for final color
-            vec3 color = uColor * (1.0 + pulse * 0.5);
-            float alpha = rim * (0.6 + pulse * 0.4);
+            // ENHANCED: Combine for final color with higher intensity
+            vec3 color = uColor * (1.0 + pulse * 0.7); // Increased from 0.5
+            float alpha = rim * (0.7 + pulse * 0.5); // Increased from 0.6 and 0.4
             
             // Output final color
             gl_FragColor = vec4(color, alpha);
@@ -908,12 +1094,12 @@ const ZenSpace = {
       // Position in scene
       energyCenter.position.set(position.x, position.y, position.z);
       
-      // Create light for the energy center (only for main/center)
+      // ENHANCED: Brighter light for the energy center (only for main/center)
       if (index === 0) {
         const light = new THREE.PointLight(
           color,
-          0.5,  // Intensity
-          30    // Distance
+          0.8,  // Increased from 0.5
+          40    // Increased from 30
         );
         light.position.copy(energyCenter.position);
         this.scene.add(light);
@@ -921,16 +1107,16 @@ const ZenSpace = {
         // Store light with energy center
         energyCenter.userData = {
           light: light,
-          pulseSpeed: 0.5,
+          pulseSpeed: 0.6, // Increased from 0.5
           floatSpeed: 0.3,
-          floatAmplitude: 0.3
+          floatAmplitude: 0.4 // Increased from 0.3
         };
       } else {
-        // Store animation data
+        // ENHANCED: More dramatic animation
         energyCenter.userData = {
-          pulseSpeed: 0.3 + Math.random() * 0.5,
+          pulseSpeed: 0.4 + Math.random() * 0.6, // Increased from 0.3 + random * 0.5
           floatSpeed: 0.2 + Math.random() * 0.4,
-          floatAmplitude: 0.1 + Math.random() * 0.5
+          floatAmplitude: 0.2 + Math.random() * 0.6 // Increased from 0.1 + random * 0.5
         };
       }
       
@@ -953,6 +1139,9 @@ const ZenSpace = {
     
     // Create Metatron's Cube 
     this.createMetatronCube();
+    
+    // ENHANCED: Create Sri Yantra (new sacred geometry pattern)
+    this.createSriYantra();
   },
   
   // Create Flower of Life geometry
@@ -963,15 +1152,16 @@ const ZenSpace = {
     // Group to hold all circles
     const flowerGroup = new THREE.Group();
     
-    // Parameters
-    const radius = 0.8;  // Radius of each circle
+    // ENHANCED: Larger radius
+    const radius = 1.0;  // Increased from 0.8
     const color = this.config.colors.energy[1]; // Use energy color
     
     // Create center circle
     const center = { x: 0, y: 0 };
     this.createSacredCircle(flowerGroup, center.x, center.y, radius, color);
     
-    // Create first ring (6 circles)
+    // ENHANCED: Create two rings of circles (was only one)
+    // First ring (6 circles)
     for (let i = 0; i < 6; i++) {
       const angle = (Math.PI / 3) * i;
       const x = center.x + radius * 2 * Math.cos(angle);
@@ -979,12 +1169,20 @@ const ZenSpace = {
       this.createSacredCircle(flowerGroup, x, y, radius, color);
     }
     
+    // Second ring (12 circles)
+    for (let i = 0; i < 12; i++) {
+      const angle = (Math.PI / 6) * i;
+      const x = center.x + radius * 4 * Math.cos(angle);
+      const y = center.y + radius * 4 * Math.sin(angle);
+      this.createSacredCircle(flowerGroup, x, y, radius, color);
+    }
+    
     // Position group in scene
     flowerGroup.position.set(position.x, position.y, position.z);
     
-    // Add rotation animation
+    // ENHANCED: Faster rotation animation
     flowerGroup.userData = {
-      rotationSpeed: 0.005,
+      rotationSpeed: 0.007, // Increased from 0.005
       floatSpeed: 0.15,
       floatAmplitude: 0.3,
       originalY: position.y
@@ -1008,8 +1206,8 @@ const ZenSpace = {
     // Group to hold all elements
     const cubeGroup = new THREE.Group();
     
-    // Parameters
-    const radius = 0.4;
+    // ENHANCED: Larger radius
+    const radius = 0.6; // Increased from 0.4
     const color = this.config.colors.energy[3]; // Use energy color
     
     // Create center circle
@@ -1030,11 +1228,28 @@ const ZenSpace = {
       this.createSacredCircle(cubeGroup, vertex.x, vertex.y, radius, color, vertex.z);
     });
     
+    // ENHANCED: Create circles at the 8 corners of the cube
+    const corners = [
+      { x: radius, y: radius, z: radius },
+      { x: -radius, y: radius, z: radius },
+      { x: radius, y: -radius, z: radius },
+      { x: -radius, y: -radius, z: radius },
+      { x: radius, y: radius, z: -radius },
+      { x: -radius, y: radius, z: -radius },
+      { x: radius, y: -radius, z: -radius },
+      { x: -radius, y: -radius, z: -radius }
+    ];
+    
+    // Create circles at corners
+    corners.forEach(corner => {
+      this.createSacredCircle(cubeGroup, corner.x, corner.y, radius * 0.5, color, corner.z);
+    });
+    
     // Create lines connecting vertices
     const lineMaterial = new THREE.LineBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 0.3,
+      opacity: 0.5, // INCREASED from 0.3
       blending: THREE.AdditiveBlending
     });
     
@@ -1054,11 +1269,11 @@ const ZenSpace = {
     // Position group in scene
     cubeGroup.position.set(position.x, position.y, position.z);
     
-    // Add rotation animation
+    // ENHANCED: Faster rotation animation
     cubeGroup.userData = {
-      rotationSpeed: 0.01,
+      rotationSpeed: 0.015, // Increased from 0.01
       floatSpeed: 0.2,
-      floatAmplitude: 0.2,
+      floatAmplitude: 0.25, // Increased from 0.2
       originalY: position.y
     };
     
@@ -1072,16 +1287,84 @@ const ZenSpace = {
     this.scene.add(cubeGroup);
   },
   
+  // ENHANCED: New sacred geometry - Sri Yantra
+  createSriYantra: function() {
+    // Position in scene
+    const position = { x: 0, y: -30, z: -18 };
+    
+    // Group to hold all elements
+    const yantraGroup = new THREE.Group();
+    
+    // Use gold color
+    const color = this.config.colors.energy[3];
+    
+    // Create outer circle
+    this.createSacredCircle(yantraGroup, 0, 0, 4, color);
+    
+    // Create triangles - simplified Sri Yantra with just 2 triangles
+    const triangleMaterial = new THREE.LineBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending
+    });
+    
+    // Upward triangle
+    const upTriangleGeometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 3, 0),
+      new THREE.Vector3(-3 * Math.cos(Math.PI/6), -3 * Math.sin(Math.PI/6), 0),
+      new THREE.Vector3(3 * Math.cos(Math.PI/6), -3 * Math.sin(Math.PI/6), 0),
+      new THREE.Vector3(0, 3, 0)
+    ]);
+    
+    const upTriangle = new THREE.Line(upTriangleGeometry, triangleMaterial);
+    yantraGroup.add(upTriangle);
+    
+    // Downward triangle
+    const downTriangleGeometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, -3, 0),
+      new THREE.Vector3(-3 * Math.cos(Math.PI/6), 3 * Math.sin(Math.PI/6), 0),
+      new THREE.Vector3(3 * Math.cos(Math.PI/6), 3 * Math.sin(Math.PI/6), 0),
+      new THREE.Vector3(0, -3, 0)
+    ]);
+    
+    const downTriangle = new THREE.Line(downTriangleGeometry, triangleMaterial);
+    yantraGroup.add(downTriangle);
+    
+    // Add inner circle (bindu)
+    this.createSacredCircle(yantraGroup, 0, 0, 0.5, color);
+    
+    // Position group in scene
+    yantraGroup.position.set(position.x, position.y, position.z);
+    
+    // Animation parameters
+    yantraGroup.userData = {
+      rotationSpeed: 0.005,
+      floatSpeed: 0.12,
+      floatAmplitude: 0.3,
+      originalY: position.y
+    };
+    
+    // Add to sacred geometry array
+    this.zenElements.sacredGeometry.push({
+      mesh: yantraGroup,
+      type: 'sriYantra'
+    });
+    
+    // Add to scene
+    this.scene.add(yantraGroup);
+  },
+  
   // Helper to create circles for sacred geometry
   createSacredCircle: function(group, x, y, radius, color, z = 0) {
     // Create geometry
     const geometry = new THREE.CircleGeometry(radius, 32);
     
-    // Create material
+    // ENHANCED: More visible material
     const material = new THREE.MeshBasicMaterial({
       color: color,
       transparent: true,
-      opacity: 0.3,
+      opacity: 0.5, // Increased from 0.3
       blending: THREE.AdditiveBlending,
       side: THREE.DoubleSide
     });
@@ -1116,7 +1399,7 @@ const ZenSpace = {
     // Create ripple geometry
     const geometry = new THREE.CircleGeometry(0.1, 32);
     
-    // Create ripple material
+    // ENHANCED: Brighter ripple material
     const material = new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
@@ -1147,14 +1430,17 @@ const ZenSpace = {
           vec2 centeredUv = vUv - 0.5;
           float distanceToCenter = length(centeredUv);
           
-          // Create ring shape
+          // ENHANCED: Create sharper ring shape
           float innerRadius = uRadius - uWidth * 0.5;
           float outerRadius = uRadius + uWidth * 0.5;
           float ring = smoothstep(innerRadius, innerRadius + 0.01, distanceToCenter) * 
                        smoothstep(outerRadius, outerRadius - 0.01, distanceToCenter);
           
-          // Output final color
-          gl_FragColor = vec4(uColor, ring * uAlpha);
+          // ENHANCED: Add glow effect around the ring
+          float glow = smoothstep(outerRadius + 0.1, outerRadius, distanceToCenter) * 0.5;
+          
+          // Output final color with glow
+          gl_FragColor = vec4(uColor, (ring + glow) * uAlpha);
         }
       `,
       transparent: true,
@@ -1199,12 +1485,12 @@ const ZenSpace = {
         // Calculate progress (0 to 1)
         const progress = age / ripple.duration;
         
-        // Update radius
-        const radius = 0.1 + progress * 10;
+        // ENHANCED: Larger ripple radius
+        const radius = 0.1 + progress * 15; // Increased from 10
         ripple.material.uniforms.uRadius.value = radius;
         
-        // Update width
-        const width = 0.05 + progress * 0.5;
+        // ENHANCED: Wider ring
+        const width = 0.05 + progress * 0.7; // Increased from 0.5
         ripple.material.uniforms.uWidth.value = width;
         
         // Update alpha
@@ -1224,10 +1510,10 @@ const ZenSpace = {
   // Get a random mandala texture (procedurally generated)
   getRandomMandalaTexture: function() {
     try {
-      // Create canvas for texture
+      // ENHANCED: Create higher resolution canvas for more detailed textures
       const canvas = document.createElement('canvas');
-      canvas.width = 256; // Reduced from 512 for better performance
-      canvas.height = 256; // Reduced from 512 for better performance
+      canvas.width = 512; // Increased from 256
+      canvas.height = 512; // Increased from 256
       const ctx = canvas.getContext('2d');
       
       // Clear canvas
@@ -1237,29 +1523,40 @@ const ZenSpace = {
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
       
-      // Create a simpler mandala pattern for better performance
+      // ENHANCED: Create more detailed mandala pattern
       ctx.strokeStyle = 'white';
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.2)'; // Increased opacity from 0.1
       
       // Draw circles
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 5; i++) { // Increased from 3
         ctx.beginPath();
-        ctx.arc(centerX, centerY, 30 + i * 40, 0, Math.PI * 2);
+        ctx.arc(centerX, centerY, 40 + i * 35, 0, Math.PI * 2);
         ctx.stroke();
       }
       
       // Draw lines
-      const lines = 12;
+      const lines = 18; // Increased from 12
       for (let i = 0; i < lines; i++) {
         const angle = (Math.PI * 2 / lines) * i;
-        const x1 = centerX + Math.cos(angle) * 20;
-        const y1 = centerY + Math.sin(angle) * 20;
-        const x2 = centerX + Math.cos(angle) * 120;
-        const y2 = centerY + Math.sin(angle) * 120;
+        const x1 = centerX + Math.cos(angle) * 30;
+        const y1 = centerY + Math.sin(angle) * 30;
+        const x2 = centerX + Math.cos(angle) * 180; // Increased from 120
+        const y2 = centerY + Math.sin(angle) * 180; // Increased from 120
         
         ctx.beginPath();
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+      
+      // ENHANCED: Draw petal shapes
+      for (let i = 0; i < lines/2; i++) {
+        const angle = (Math.PI * 2 / (lines/2)) * i;
+        const x1 = centerX + Math.cos(angle) * 80;
+        const y1 = centerY + Math.sin(angle) * 80;
+        
+        ctx.beginPath();
+        ctx.ellipse(x1, y1, 30, 15, angle, 0, Math.PI * 2);
         ctx.stroke();
       }
       
@@ -1281,10 +1578,6 @@ const ZenSpace = {
       return texture;
     }
   },
-  
-  // These complex mandala drawing functions are removed for better performance
-  // and replaced with the simpler mandala pattern in getRandomMandalaTexture
-
   
   // Animation loop
   animate: function() {
@@ -1318,6 +1611,11 @@ const ZenSpace = {
   
   // Update material uniforms with current time
   updateMaterials: function() {
+    // Update portal shader
+    if (this.shaders.portal) {
+      this.shaders.portal.uniforms.uTime.value = this.time.elapsed;
+    }
+    
     // Update nebula shader
     if (this.shaders.nebula) {
       this.shaders.nebula.uniforms.uTime.value = this.time.elapsed;
@@ -1342,6 +1640,12 @@ const ZenSpace = {
     this.zenElements.energyCenters.forEach(center => {
       center.material.uniforms.uTime.value = this.time.elapsed;
     });
+    
+    // Update portal light
+    if (this.portal.light) {
+      const intensity = 0.8 + 0.4 * Math.sin(this.time.elapsed * 0.3);
+      this.portal.light.intensity = intensity;
+    }
   },
   
   // Update particle movements
@@ -1372,7 +1676,7 @@ const ZenSpace = {
       
       // Pulsing effect already handled in shader
       
-      // Floating movement
+      // ENHANCED: More dramatic floating movement
       const floatY = Math.sin(this.time.elapsed * userData.floatSpeed) * userData.floatAmplitude;
       mesh.position.y = originalPos.y + floatY;
       
@@ -1380,8 +1684,8 @@ const ZenSpace = {
       if (userData.light) {
         userData.light.position.copy(mesh.position);
         
-        // Pulsing light intensity
-        const pulse = 0.5 + 0.3 * Math.sin(this.time.elapsed * userData.pulseSpeed);
+        // ENHANCED: More dramatic pulsing light intensity
+        const pulse = 0.6 + 0.4 * Math.sin(this.time.elapsed * userData.pulseSpeed); // Increased from 0.5 + 0.3
         userData.light.intensity = pulse;
       }
     });
@@ -1391,9 +1695,9 @@ const ZenSpace = {
       const mesh = geometry.mesh;
       const userData = mesh.userData;
       
-      // Rotate geometry
+      // ENHANCED: More dynamic rotation
       mesh.rotation.z += userData.rotationSpeed * this.time.delta;
-      mesh.rotation.y += userData.rotationSpeed * 0.5 * this.time.delta;
+      mesh.rotation.y += userData.rotationSpeed * 0.7 * this.time.delta; // Increased from 0.5
       
       // Floating movement
       const floatY = Math.sin(this.time.elapsed * userData.floatSpeed) * userData.floatAmplitude;
@@ -1403,8 +1707,8 @@ const ZenSpace = {
   
   // Update other effects (e.g., zen quotes)
   updateEffects: function() {
-    // Check if it's time to show a zen quote
-    if (Math.random() < 0.0005) { // 0.05% chance per frame
+    // ENHANCED: More frequent zen quotes
+    if (Math.random() < 0.001) { // Increased from 0.0005
       this.showZenQuote();
     }
   },
@@ -1424,12 +1728,12 @@ const ZenSpace = {
     quoteElement.className = 'zen-quote';
     quoteElement.textContent = quote;
     
-    // Style quote
+    // ENHANCED: More visible styling
     quoteElement.style.cssText = `
       position: fixed;
       color: rgba(255, 255, 255, 0);
       font-family: 'Zen Old Mincho', serif;
-      font-size: 24px;
+      font-size: 28px; // Increased from 24px
       text-align: center;
       padding: 20px;
       top: ${30 + Math.random() * 40}%;
@@ -1437,7 +1741,7 @@ const ZenSpace = {
       transform: translateX(-50%);
       z-index: 100;
       pointer-events: none;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 215, 0, 0.5); // Enhanced glow
       opacity: 0;
       transition: opacity 4s, color 4s;
     `;
@@ -1447,8 +1751,8 @@ const ZenSpace = {
     
     // Fade in
     setTimeout(() => {
-      quoteElement.style.opacity = '0.8';
-      quoteElement.style.color = 'rgba(255, 255, 255, 0.8)';
+      quoteElement.style.opacity = '0.9'; // Increased from 0.8
+      quoteElement.style.color = 'rgba(255, 255, 255, 0.9)'; // Increased from 0.8
     }, 100);
     
     // Fade out and remove

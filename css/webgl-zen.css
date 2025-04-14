@@ -1,4 +1,4 @@
-/* WebGL Zen Space CSS */
+/* WebGL Zen Space CSS - Enhanced Version */
 
 /* Zen space container */
 #zen-space-container {
@@ -22,12 +22,12 @@
     z-index: -10;
 }
 
-/* Zen quote styling */
+/* Zen quote styling - ENHANCED for more visibility */
 .zen-quote {
     position: fixed;
     font-family: 'Zen Old Mincho', serif;
-    font-size: 24px;
-    color: rgba(255, 255, 255, 0.8);
+    font-size: 28px; /* Increased from 24px */
+    color: rgba(255, 255, 255, 0.9); /* Increased from 0.8 */
     text-align: center;
     padding: 20px;
     max-width: 80%;
@@ -36,19 +36,20 @@
     transform: translateX(-50%);
     z-index: 100;
     pointer-events: none;
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 215, 0, 0.5); /* Enhanced glow */
     opacity: 0;
-    transition: opacity 4s, color 4s;
+    transition: opacity 3s, color 3s; /* Faster transition */
+    letter-spacing: 1px; /* Added letter spacing */
 }
 
-/* Loading overlay */
+/* Loading overlay - ENHANCED with more vibrant colors */
 #zen-loading {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #050718;
+    background-color: #030412; /* Darker background */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -58,20 +59,22 @@
 }
 
 #zen-loading .loader {
-    width: 80px;
-    height: 80px;
+    width: 100px; /* Increased from 80px */
+    height: 100px; /* Increased from 80px */
     border-radius: 50%;
-    border: 4px solid rgba(255, 255, 255, 0.1);
-    border-top-color: rgba(255, 215, 0, 0.7);
-    animation: spin 1.5s linear infinite;
+    border: 5px solid rgba(255, 255, 255, 0.15); /* Thicker border, slightly more visible */
+    border-top-color: rgba(255, 215, 0, 0.9); /* Brighter gold */
+    animation: spin 1.2s linear infinite; /* Faster spin */
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.3); /* Added glow */
 }
 
 #zen-loading .text {
-    margin-top: 20px;
-    color: rgba(255, 255, 255, 0.8);
+    margin-top: 30px; /* Increased from 20px */
+    color: rgba(255, 255, 255, 0.9); /* Brighter text */
     font-family: 'Zen Old Mincho', serif;
-    font-size: 18px;
-    letter-spacing: 2px;
+    font-size: 20px; /* Increased from 18px */
+    letter-spacing: 3px; /* Increased from 2px */
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3); /* Added glow */
 }
 
 @keyframes spin {
@@ -80,50 +83,53 @@
     }
 }
 
-/* Audio controls */
+/* Audio controls - ENHANCED with more visible styling */
 #zen-audio-controls {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 40px;
-    height: 40px;
+    width: 50px; /* Increased from 40px */
+    height: 50px; /* Increased from 40px */
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.15); /* Slightly more visible */
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s;
     z-index: 1000;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2); /* Added glow */
 }
 
 #zen-audio-controls:hover {
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.3); /* More visible on hover */
+    transform: scale(1.1); /* Added scale effect on hover */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4); /* Enhanced glow on hover */
 }
 
 #zen-audio-controls svg {
-    width: 20px;
-    height: 20px;
-    fill: rgba(255, 255, 255, 0.7);
+    width: 24px; /* Increased from 20px */
+    height: 24px; /* Increased from 20px */
+    fill: rgba(255, 255, 255, 0.9); /* Brighter icon */
 }
 
-/* Chakra info popup */
+/* Chakra info popup - ENHANCED for better visibility */
 .chakra-info {
     position: fixed;
-    background-color: rgba(10, 10, 30, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background-color: rgba(10, 10, 30, 0.85); /* More opaque */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* More visible border */
     color: white;
-    padding: 15px;
-    border-radius: 8px;
+    padding: 20px; /* Increased from 15px */
+    border-radius: 10px; /* Increased from 8px */
     font-family: 'Zen Old Mincho', serif;
-    font-size: 14px;
-    max-width: 250px;
+    font-size: 16px; /* Increased from 14px */
+    max-width: 300px; /* Increased from 250px */
     z-index: 1000;
     pointer-events: none;
     opacity: 0;
     transform: translateY(10px);
     transition: opacity 0.3s, transform 0.3s;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(255, 255, 255, 0.1); /* Enhanced shadow */
 }
 
 .chakra-info.visible {
@@ -132,37 +138,68 @@
 }
 
 .chakra-info h3 {
-    margin: 0 0 10px 0;
-    font-size: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-    padding-bottom: 5px;
+    margin: 0 0 15px 0; /* Increased from 10px */
+    font-size: 18px; /* Increased from 16px */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* More visible border */
+    padding-bottom: 8px; /* Increased from 5px */
+    letter-spacing: 1px; /* Added letter spacing */
 }
 
 .chakra-info p {
     margin: 0;
-    line-height: 1.4;
+    line-height: 1.6; /* Increased from 1.4 */
+    letter-spacing: 0.5px; /* Added letter spacing */
 }
 
-/* Balance indicator - Yin Yang */
+/* Balance indicator - Yin Yang - ENHANCED with more pronounced animation */
 #balance-indicator {
     position: fixed;
     bottom: 20px;
     left: 20px;
-    width: 40px;
-    height: 40px;
-    opacity: 0.7;
+    width: 50px; /* Increased from 40px */
+    height: 50px; /* Increased from 40px */
+    opacity: 0.85; /* Increased from 0.7 */
     z-index: 1000;
     pointer-events: none;
-    animation: pulsate 5s infinite alternate;
+    animation: pulsate 4s infinite alternate; /* Faster animation */
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3)); /* Added glow */
 }
 
 @keyframes pulsate {
     0% {
-        opacity: 0.5;
-        transform: scale(0.95);
+        opacity: 0.6; /* Increased from 0.5 */
+        transform: scale(0.92); /* Decreased from 0.95 for more pronounced effect */
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.2));
     }
     100% {
-        opacity: 0.8;
-        transform: scale(1.05);
+        opacity: 1.0; /* Increased from 0.8 */
+        transform: scale(1.08); /* Increased from 1.05 for more pronounced effect */
+        filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
     }
+}
+
+/* ENHANCED: Added animation for zen quotes appearance */
+@keyframes quoteGlow {
+    0%, 100% {
+        text-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 215, 0, 0.5);
+    }
+    50% {
+        text-shadow: 0 0 25px rgba(255, 255, 255, 0.9), 0 0 40px rgba(255, 215, 0, 0.7);
+    }
+}
+
+.zen-quote.visible {
+    animation: quoteGlow 3s infinite alternate;
+}
+
+/* ENHANCED: Added improved styling for ripple effects */
+.ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
 }
