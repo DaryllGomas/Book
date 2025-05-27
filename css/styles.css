@@ -283,13 +283,13 @@ body {
 /* Enter Zen text */
 .enter-text {
     position: absolute;
-    top: 20%;
-    right: 15%;
+    top: 10%;
+    right: 11.5%;
     transform: none;
     color: #fff;
-    font-size: 2.2rem;
+    font-size: 2.15rem;
     font-weight: normal;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.5);
+    text-shadow: 0 0 9px rgba(255, 215, 0, 0.75), 0 0 13px rgba(255, 215, 0, 0.45);
     letter-spacing: 4px;
     animation: pulsate 4s infinite alternate;
     z-index: 10;
@@ -321,12 +321,12 @@ body {
 /* Reusing and slightly modifying pulsate for book glow */
 @keyframes pulsate {
     0% {
-        /* Text shadow pulse */
-        text-shadow: 0 0 8px rgba(255, 215, 0, 0.7), 0 0 15px rgba(255, 215, 0, 0.4);
-        opacity: 0.8;
+        /* Text shadow pulse - reduced expansion */
+        text-shadow: 0 0 8px rgba(255, 215, 0, 0.7), 0 0 12px rgba(255, 215, 0, 0.4);
+        opacity: 0.9;
     }
     100% {
-        text-shadow: 0 0 15px rgba(255, 215, 0, 0.9), 0 0 30px rgba(255, 215, 0, 0.6);
+        text-shadow: 0 0 10px rgba(255, 215, 0, 0.8), 0 0 15px rgba(255, 215, 0, 0.5);
         opacity: 1;
     }
 }
@@ -459,7 +459,7 @@ body {
     }
     
     .enter-text {
-        font-size: 2rem;
+        font-size: 1.96rem;
     }
 }
 
@@ -492,8 +492,8 @@ body {
 .book-container:hover .enter-text {
     /* Keep pulse animation but make it faster on hover */
     animation: pulsate 2s infinite alternate; /* Faster duration */
-    /* Slightly increase brightness beyond normal pulse max */
-    text-shadow: 0 0 16px rgba(255, 215, 0, 1.0), 0 0 32px rgba(255, 215, 0, 0.7);
+    /* Reduced hover glow effect */
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.9), 0 0 18px rgba(255, 215, 0, 0.6);
     opacity: 1;
 }
 
