@@ -3,6 +3,11 @@
 ## Overview
 An interactive website featuring an immersive cosmic zen background with WebGL 3D effects and an interactive book element. The experience combines visual elements inspired by zen philosophy with subtle audio elements to create a meditative digital space.
 
+The book opens to reveal three sections:
+- **Enter Zen** - Journey to the path of enlightenment
+- **Ancients** - Discover the wisdom of ancient civilizations
+- **Break The Code** - Unravel mysteries and decode hidden messages
+
 ## Features
 - Advanced WebGL cosmic background
 - Interactive 3D elements with parallax effects

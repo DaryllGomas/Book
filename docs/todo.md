@@ -51,3 +51,6 @@
 - [x] Ensure responsive design works on different screen sizes
 - [x] Deploy landing page
 - [x] Provide integration instructions
+
+## Recent Updates
+- [x] Added third book entry "Break The Code" linking to https://daryllgomas.github.io/BreakTheCode/

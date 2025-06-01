@@ -75,6 +75,12 @@
                             <div class="ancient-divider">⁂</div>
                         </a>
                         
+                        <a href="https://daryllgomas.github.io/BreakTheCode/" class="ancient-section" id="breakthecode-section">
+                            <h2 class="ancient-title">Break The Code</h2>
+                            <p class="ancient-description">Unravel mysteries and decode hidden messages</p>
+                            <div class="ancient-divider">⁂</div>
+                        </a>
+                        
                         <h3 class="instruction-text">Click a section to explore</h3>
                     </div>
                 </div>
@@ -123,6 +129,7 @@
         const cosmicBackground = document.querySelector('.cosmic-background');
         const enterZenSection = document.getElementById('enter-zen-section');
         const ancientsSection = document.getElementById('ancients-section');
+        const breakTheCodeSection = document.getElementById('breakthecode-section');
         
         // Force close the loading screen after 5 seconds max
         setTimeout(function() {
@@ -159,6 +166,13 @@
           };
         }
         
+        if (breakTheCodeSection) {
+          breakTheCodeSection.onclick = function(e) {
+            window.location.href = 'https://daryllgomas.github.io/BreakTheCode/';
+            return false; // Prevent default and stop propagation
+          };
+        }
+        
         // Also add click handler to the whole book page to ensure navigation works
         if (leftPage) {
           leftPage.addEventListener('click', function(e) {
@@ -171,6 +185,12 @@
             // Check if the click happened inside ancients-section
             else if (e.target.closest('#ancients-section')) {
               window.location.href = 'https://daryllgomas.github.io/Ancients/';
+              e.preventDefault();
+              e.stopPropagation();
+            }
+            // Check if the click happened inside breakthecode-section
+            else if (e.target.closest('#breakthecode-section')) {
+              window.location.href = 'https://daryllgomas.github.io/BreakTheCode/';
               e.preventDefault();
               e.stopPropagation();
             }
