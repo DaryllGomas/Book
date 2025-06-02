@@ -53,7 +53,8 @@ const ZenSpace = {
     current: 0,
     previous: 0,
     delta: 0,
-    elapsed: 0
+    elapsed: 0,
+    lastQuoteTime: 0 // Track when last quote was shown
   },
   
   // Configuration
@@ -131,14 +132,18 @@ const ZenSpace = {
   zenQuotes: [
     "Before enlightenment, chop wood, carry water. After enlightenment, chop wood, carry water.",
     "The obstacle is the path.",
+    "Great acts are made up of small deeds. - Lao Tzu",
     "When you reach the top of the mountain, keep climbing.",
+    "What you are looking for is already in you… You already are everything you are seeking. — Thich Nhat Hanh",
     "The journey of a thousand miles begins with a single step.",
-    "If you meet the Buddha on the road, kill him.",
+    "He who conquers others is strong; He who conquers himself is mighty. - Lao Tzu",
+    "Enter Zen From Here.",
+    "You may believe yourself out of harmoney with life and the eternal, but you can not be, because you are life and exist now.", 
     "When hungry, eat; when tired, sleep.",
     "The quieter you become, the more you can hear.",
-    "Zen is not some kind of excitement, but concentration on our usual everyday routine.",
+    "Zen is not some kind of excitement, but concentration on our usual everyday routine. Shunryu Suzuki",
     "No snowflake ever falls in the wrong place.",
-    "To follow the path, look to the master, follow the master, walk with the master, see through the master, become the master."
+    "To follow the path, look to the master, follow the master, walk with the master, see through the master, become the master.",
   ],
   
   // Initialize the WebGL scene
@@ -2191,19 +2196,18 @@ const ZenSpace = {
   
   // Update other effects (e.g., zen quotes)
   updateEffects: function() {
-    // ENHANCED: More frequent zen quotes
-    if (Math.random() < 0.001) { // Increased from 0.0005
-      this.showZenQuote();
+    // Show zen quotes every 10 seconds
+    if (this.time.elapsed - this.time.lastQuoteTime > 10) {
+      // Check if a quote is already showing
+      if (!document.querySelector('.zen-quote')) {
+        this.showZenQuote();
+        this.time.lastQuoteTime = this.time.elapsed;
+      }
     }
   },
   
   // Show a zen quote
   showZenQuote: function() {
-    // Check if a quote is already showing
-    if (document.querySelector('.zen-quote')) {
-      return;
-    }
-    
     // Get random quote
     const quote = this.zenQuotes[Math.floor(Math.random() * this.zenQuotes.length)];
     
@@ -2222,34 +2226,40 @@ const ZenSpace = {
       padding: 20px;
       top: ${30 + Math.random() * 40}%;
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY(20px);
       z-index: 100;
       pointer-events: none;
-      text-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 215, 0, 0.5); // Enhanced glow
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 0 0 40px rgba(255, 215, 0, 0.2); // More ghostly glow
       opacity: 0;
-      transition: opacity 4s, color 4s;
+      transition: all 3s ease-out;
+      filter: blur(2px);
+      letter-spacing: 2px;
     `;
     
     // Add to document
     document.body.appendChild(quoteElement);
     
-    // Fade in
+    // Fade in with ghostly effect
     setTimeout(() => {
-      quoteElement.style.opacity = '0.9'; // Increased from 0.8
-      quoteElement.style.color = 'rgba(255, 255, 255, 0.9)'; // Increased from 0.8
+      quoteElement.style.opacity = '0.7'; // More translucent
+      quoteElement.style.color = 'rgba(255, 255, 255, 0.7)'; // More ghostly
+      quoteElement.style.transform = 'translateX(-50%) translateY(0)';
+      quoteElement.style.filter = 'blur(0px)';
     }, 100);
     
     // Fade out and remove
     setTimeout(() => {
       quoteElement.style.opacity = '0';
       quoteElement.style.color = 'rgba(255, 255, 255, 0)';
+      quoteElement.style.transform = 'translateX(-50%) translateY(-20px)';
+      quoteElement.style.filter = 'blur(2px)';
       
       // Remove after fade out
       setTimeout(() => {
         if (quoteElement.parentNode) {
           quoteElement.parentNode.removeChild(quoteElement);
         }
-      }, 4000);
-    }, 8000);
+      }, 3000);
+    }, 10000); // Show for 10 seconds
   }
 };

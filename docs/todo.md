@@ -63,3 +63,9 @@
   - [x] Orbital movements and floating animations
 - [x] Fixed WebGL initialization for GitHub Pages compatibility
 - [x] Removed "Enter Zen" text overlay from book cover
+- [x] Enhanced zen quotes:
+  - [x] Appear every 10 seconds (instead of randomly)
+  - [x] More ghostly fade-in effect with blur transition
+  - [x] Translucent appearance (70% opacity)
+  - [x] Floating animation for ethereal movement
+  - [x] Layered text shadow for ghostly glow

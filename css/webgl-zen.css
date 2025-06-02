@@ -27,7 +27,7 @@
     position: fixed;
     font-family: 'Zen Old Mincho', serif;
     font-size: 28px; /* Increased from 24px */
-    color: rgba(255, 255, 255, 0.9); /* Increased from 0.8 */
+    color: rgba(255, 255, 255, 0.7); /* More translucent */
     text-align: center;
     padding: 20px;
     max-width: 80%;
@@ -36,10 +36,22 @@
     transform: translateX(-50%);
     z-index: 100;
     pointer-events: none;
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 215, 0, 0.5); /* Enhanced glow */
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 0 0 40px rgba(255, 215, 0, 0.2), 0 0 60px rgba(255, 255, 255, 0.1); /* Ghostly layered glow */
     opacity: 0;
-    transition: opacity 3s, color 3s; /* Faster transition */
-    letter-spacing: 1px; /* Added letter spacing */
+    transition: opacity 3s, color 3s, transform 3s, filter 3s; /* Smooth transitions */
+    letter-spacing: 2px; /* Added letter spacing */
+    filter: blur(0px);
+    animation: ghostlyFloat 10s ease-in-out infinite;
+}
+
+/* Ghostly floating animation */
+@keyframes ghostlyFloat {
+    0%, 100% {
+        transform: translateX(-50%) translateY(0px);
+    }
+    50% {
+        transform: translateX(-50%) translateY(-10px);
+    }
 }
 
 /* Loading overlay - ENHANCED with more vibrant colors */
