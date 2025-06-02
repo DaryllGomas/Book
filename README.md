@@ -12,6 +12,12 @@ The book opens to reveal three sections:
 - Advanced WebGL cosmic background
 - Interactive 3D elements with parallax effects
 - Energy flows, mandalas, and sacred geometry patterns
+- Floating sacred geometry around the book:
+  - Platonic solids (Tetrahedron, Octahedron, Icosahedron, Dodecahedron)
+  - Seed of Life pattern
+  - Vesica Piscis
+  - Merkaba (Star Tetrahedron)
+  - Golden Spiral
 - Zen quotes that appear occasionally
 - Ambient audio experience with meditation bells
 - Interactive book element as the focal point

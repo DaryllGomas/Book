@@ -54,3 +54,12 @@
 
 ## Recent Updates
 - [x] Added third book entry "Break The Code" linking to https://daryllgomas.github.io/BreakTheCode/
+- [x] Added floating sacred geometry around the book:
+  - [x] Platonic solids with wireframe and glowing cores
+  - [x] Seed of Life pattern with pulsing animation
+  - [x] Vesica Piscis with breathing scale effect
+  - [x] Merkaba (Star Tetrahedron) with complex rotation
+  - [x] Golden Spiral with particle effects
+  - [x] Orbital movements and floating animations
+- [x] Fixed WebGL initialization for GitHub Pages compatibility
+- [x] Removed "Enter Zen" text overlay from book cover

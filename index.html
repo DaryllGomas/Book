@@ -58,7 +58,6 @@
             <div class="book">
                 <div class="book-cover">
                     <img src="assets/book2.png" alt="Zen Book Cover showing a path through a serene landscape">
-                    <div class="enter-text">Enter Zen</div>
                 </div>
                 <div class="book-page left-page">
                     <div class="ancient-text">
@@ -109,7 +108,13 @@
     <!-- Three.js and other libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/postprocessing/6.23.4/postprocessing.min.js"></script>
+    <!-- Three.js post-processing from examples -->
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r128/examples/js/postprocessing/UnrealBloomPass.js"></script>
     
     <!-- Project scripts -->
     <script src="js/script.js"></script>
@@ -202,6 +207,48 @@
         link.rel = 'stylesheet';
         link.href = 'https://fonts.googleapis.com/css2?family=Cinzel&family=Cinzel+Decorative&display=swap';
         document.head.appendChild(link);
+        
+        // Initialize WebGL Zen Space
+        console.log('Initializing WebGL Zen Space...');
+        try {
+          // Wait for Three.js to load
+          if (typeof THREE !== 'undefined' && typeof ZenSpace !== 'undefined') {
+            console.log('Three.js and ZenSpace loaded, initializing...');
+            const initSuccess = ZenSpace.init('zen-space-container');
+            if (initSuccess) {
+              console.log('WebGL Zen Space initialized successfully');
+              // Hide loading screen
+              setTimeout(() => {
+                const zenLoading = document.getElementById('zen-loading');
+                if (zenLoading) {
+                  zenLoading.style.opacity = '0';
+                  setTimeout(() => {
+                    zenLoading.style.display = 'none';
+                  }, 1500);
+                }
+              }, 1000);
+            } else {
+              console.error('WebGL Zen Space initialization failed');
+            }
+          } else {
+            console.error('Three.js or ZenSpace not loaded');
+            // Retry after a delay
+            setTimeout(() => {
+              if (typeof THREE !== 'undefined' && typeof ZenSpace !== 'undefined') {
+                console.log('Retrying WebGL initialization...');
+                ZenSpace.init('zen-space-container');
+              }
+            }, 1000);
+          }
+        } catch (error) {
+          console.error('Error initializing WebGL:', error);
+        }
+        
+        // Initialize audio
+        if (typeof ZenAudio !== 'undefined') {
+          console.log('Initializing Zen Audio...');
+          ZenAudio.init();
+        }
       });
     </script>
     <style>

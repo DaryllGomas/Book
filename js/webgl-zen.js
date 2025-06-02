@@ -28,7 +28,8 @@ const ZenSpace = {
   zenElements: {
     mandalas: [],
     energyCenters: [],
-    sacredGeometry: []
+    sacredGeometry: [],
+    floatingGeometry: [] // New: Sacred geometry specifically around the book
   },
   
   // Interactive elements
@@ -142,6 +143,19 @@ const ZenSpace = {
   
   // Initialize the WebGL scene
   init: function(containerId) {
+    // Check WebGL availability
+    if (!window.WebGLRenderingContext) {
+      console.error('WebGL not supported in this browser');
+      return false;
+    }
+    
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) {
+      console.error('WebGL not available');
+      return false;
+    }
+    
     this.container = document.getElementById(containerId);
     if (!this.container) {
       console.error('Container element not found');
@@ -173,6 +187,8 @@ const ZenSpace = {
     this.animate();
     
     console.log('WebGL Zen Space initialized');
+    console.log('Scene children:', this.scene.children.length);
+    console.log('Camera position:', this.camera.position);
     return true;
   },
   
@@ -243,21 +259,45 @@ const ZenSpace = {
   
   // Initialize post-processing for glow effects
   initPostProcessing: function() {
-    // Create composer for post-processing
-    this.composer = new THREE.EffectComposer(this.renderer);
-    
-    // Add render pass
-    const renderPass = new THREE.RenderPass(this.scene, this.camera);
-    this.composer.addPass(renderPass);
-    
-    // Add unreal bloom pass for glow effect
-    const bloomPass = new THREE.UnrealBloomPass(
-      new THREE.Vector2(window.innerWidth, window.innerHeight),
-      this.config.bloom.strength,
-      this.config.bloom.radius,
-      this.config.bloom.threshold
-    );
-    this.composer.addPass(bloomPass);
+    try {
+      // Check if post-processing classes are available
+      if (typeof THREE.EffectComposer !== 'undefined') {
+        // Create composer for post-processing
+        this.composer = new THREE.EffectComposer(this.renderer);
+        
+        // Add render pass
+        const renderPass = new THREE.RenderPass(this.scene, this.camera);
+        this.composer.addPass(renderPass);
+        
+        // Add unreal bloom pass for glow effect
+        const bloomPass = new THREE.UnrealBloomPass(
+          new THREE.Vector2(window.innerWidth, window.innerHeight),
+          this.config.bloom.strength,
+          this.config.bloom.radius,
+          this.config.bloom.threshold
+        );
+        this.composer.addPass(bloomPass);
+      } else if (window.POSTPROCESSING) {
+        // Alternative: use POSTPROCESSING namespace if available
+        const { EffectComposer, RenderPass, BloomEffect, EffectPass } = POSTPROCESSING;
+        this.composer = new EffectComposer(this.renderer);
+        this.composer.addPass(new RenderPass(this.scene, this.camera));
+        
+        const bloomEffect = new BloomEffect({
+          intensity: this.config.bloom.strength,
+          luminanceThreshold: this.config.bloom.threshold,
+          luminanceSmoothing: this.config.bloom.radius
+        });
+        
+        this.composer.addPass(new EffectPass(this.camera, bloomEffect));
+      } else {
+        console.warn('Post-processing not available, using basic renderer');
+        this.composer = null;
+      }
+    } catch (error) {
+      console.error('Error initializing post-processing:', error);
+      this.composer = null;
+    }
   },
   
   // Add event listeners
@@ -280,7 +320,9 @@ const ZenSpace = {
     
     // Update renderer size
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.composer.setSize(window.innerWidth, window.innerHeight);
+    if (this.composer) {
+      this.composer.setSize(window.innerWidth, window.innerHeight);
+    }
   },
   
   // Handle mouse movement
@@ -1142,6 +1184,9 @@ const ZenSpace = {
     
     // ENHANCED: Create Sri Yantra (new sacred geometry pattern)
     this.createSriYantra();
+    
+    // NEW: Create floating sacred geometry around the book
+    this.createFloatingGeometry();
   },
   
   // Create Flower of Life geometry
@@ -1353,6 +1398,357 @@ const ZenSpace = {
     
     // Add to scene
     this.scene.add(yantraGroup);
+  },
+  
+  // NEW: Create floating sacred geometry around the book
+  createFloatingGeometry: function() {
+    console.log('Creating floating sacred geometry...');
+    // Create multiple sacred geometry patterns floating around the book
+    
+    // 1. Platonic Solids (Tetrahedron, Octahedron, Icosahedron)
+    this.createPlatonicSolid({ x: -15, y: 8, z: 10 }, 'tetrahedron');
+    this.createPlatonicSolid({ x: 18, y: -5, z: 8 }, 'octahedron');
+    this.createPlatonicSolid({ x: -12, y: -12, z: 12 }, 'icosahedron');
+    
+    // 2. Seed of Life pattern
+    this.createSeedOfLife({ x: 20, y: 12, z: 5 });
+    
+    // 3. Vesica Piscis
+    this.createVesicaPiscis({ x: -18, y: 0, z: 7 });
+    
+    // 4. Merkaba (Star Tetrahedron)
+    this.createMerkaba({ x: 0, y: 15, z: 6 });
+    
+    // 5. Golden Spiral
+    this.createGoldenSpiral({ x: 15, y: -15, z: 9 });
+    
+    // 6. Dodecahedron (12-sided platonic solid)
+    this.createPlatonicSolid({ x: -8, y: 18, z: 11 }, 'dodecahedron');
+    
+    console.log('Created', this.zenElements.floatingGeometry.length, 'floating geometry objects');
+  },
+  
+  // Create Platonic Solid
+  createPlatonicSolid: function(position, type) {
+    let geometry;
+    const radius = 1.2;
+    const color = this.config.colors.energy[Math.floor(Math.random() * this.config.colors.energy.length)];
+    
+    switch(type) {
+      case 'tetrahedron':
+        geometry = new THREE.TetrahedronGeometry(radius, 0);
+        break;
+      case 'octahedron':
+        geometry = new THREE.OctahedronGeometry(radius, 0);
+        break;
+      case 'icosahedron':
+        geometry = new THREE.IcosahedronGeometry(radius, 0);
+        break;
+      case 'dodecahedron':
+        geometry = new THREE.DodecahedronGeometry(radius, 0);
+        break;
+      default:
+        geometry = new THREE.TetrahedronGeometry(radius, 0);
+    }
+    
+    // Create wireframe material for mystical look
+    const material = new THREE.MeshBasicMaterial({
+      color: color,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.6
+    });
+    
+    // Also create a glowing core
+    const coreMaterial = new THREE.MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 0.2,
+      blending: THREE.AdditiveBlending
+    });
+    
+    // Create both wireframe and solid versions
+    const wireframeMesh = new THREE.Mesh(geometry, material);
+    const coreMesh = new THREE.Mesh(geometry, coreMaterial);
+    
+    // Group them together
+    const group = new THREE.Group();
+    group.add(wireframeMesh);
+    group.add(coreMesh);
+    
+    // Position the group
+    group.position.set(position.x, position.y, position.z);
+    
+    // Animation parameters
+    group.userData = {
+      rotationSpeed: {
+        x: (Math.random() - 0.5) * 0.02,
+        y: (Math.random() - 0.5) * 0.02,
+        z: (Math.random() - 0.5) * 0.02
+      },
+      floatSpeed: 0.3 + Math.random() * 0.2,
+      floatAmplitude: 1 + Math.random() * 0.5,
+      orbitRadius: 3 + Math.random() * 2,
+      orbitSpeed: 0.1 + Math.random() * 0.1,
+      originalPosition: { ...position },
+      type: 'platonic'
+    };
+    
+    // Add to floating geometry array
+    this.zenElements.floatingGeometry.push({
+      mesh: group,
+      type: type
+    });
+    
+    // Add to scene
+    this.scene.add(group);
+  },
+  
+  // Create Seed of Life pattern
+  createSeedOfLife: function(position) {
+    const group = new THREE.Group();
+    const radius = 0.5;
+    const color = this.config.colors.energy[2];
+    
+    // Center circle
+    this.createSacredCircle(group, 0, 0, radius, color);
+    
+    // Six surrounding circles
+    for (let i = 0; i < 6; i++) {
+      const angle = (Math.PI / 3) * i;
+      const x = radius * 2 * Math.cos(angle);
+      const y = radius * 2 * Math.sin(angle);
+      this.createSacredCircle(group, x, y, radius, color);
+    }
+    
+    // Position group
+    group.position.set(position.x, position.y, position.z);
+    
+    // Animation parameters
+    group.userData = {
+      rotationSpeed: 0.01,
+      floatSpeed: 0.25,
+      floatAmplitude: 0.8,
+      pulseSpeed: 0.5,
+      originalPosition: { ...position },
+      type: 'seedOfLife'
+    };
+    
+    // Add to floating geometry array
+    this.zenElements.floatingGeometry.push({
+      mesh: group,
+      type: 'seedOfLife'
+    });
+    
+    // Add to scene
+    this.scene.add(group);
+  },
+  
+  // Create Vesica Piscis
+  createVesicaPiscis: function(position) {
+    const group = new THREE.Group();
+    const radius = 1.5;
+    const color = this.config.colors.energy[4];
+    
+    // Create two overlapping circles
+    const circle1 = this.createSacredCircle(group, -radius/2, 0, radius, color);
+    const circle2 = this.createSacredCircle(group, radius/2, 0, radius, color);
+    
+    // Add central almond shape highlight
+    const almondGeometry = new THREE.Shape();
+    const angle1 = Math.acos(0.25); // Where circles intersect
+    almondGeometry.moveTo(0, radius * Math.sin(angle1));
+    almondGeometry.absarc(-radius/2, 0, radius, angle1, -angle1, false);
+    almondGeometry.absarc(radius/2, 0, radius, Math.PI + angle1, Math.PI - angle1, false);
+    
+    const almondMesh = new THREE.Mesh(
+      new THREE.ShapeGeometry(almondGeometry),
+      new THREE.MeshBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.3,
+        blending: THREE.AdditiveBlending
+      })
+    );
+    
+    group.add(almondMesh);
+    
+    // Position group
+    group.position.set(position.x, position.y, position.z);
+    
+    // Animation parameters
+    group.userData = {
+      rotationSpeed: 0.008,
+      floatSpeed: 0.2,
+      floatAmplitude: 0.6,
+      scaleSpeed: 0.3,
+      originalPosition: { ...position },
+      type: 'vesicaPiscis'
+    };
+    
+    // Add to floating geometry array
+    this.zenElements.floatingGeometry.push({
+      mesh: group,
+      type: 'vesicaPiscis'
+    });
+    
+    // Add to scene
+    this.scene.add(group);
+  },
+  
+  // Create Merkaba (Star Tetrahedron)
+  createMerkaba: function(position) {
+    const group = new THREE.Group();
+    const radius = 1.5;
+    const color = new THREE.Color(0xffd700); // Gold color for merkaba
+    
+    // Create two tetrahedrons
+    const geometry = new THREE.TetrahedronGeometry(radius, 0);
+    
+    // Upward pointing tetrahedron
+    const material1 = new THREE.MeshBasicMaterial({
+      color: color,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.7
+    });
+    const tetra1 = new THREE.Mesh(geometry, material1);
+    
+    // Downward pointing tetrahedron
+    const material2 = new THREE.MeshBasicMaterial({
+      color: color,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.7
+    });
+    const tetra2 = new THREE.Mesh(geometry.clone(), material2);
+    tetra2.rotation.y = Math.PI;
+    tetra2.rotation.z = Math.PI;
+    
+    group.add(tetra1);
+    group.add(tetra2);
+    
+    // Add glowing center sphere
+    const centerSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(radius * 0.2, 16, 16),
+      new THREE.MeshBasicMaterial({
+        color: color,
+        transparent: true,
+        opacity: 0.8,
+        blending: THREE.AdditiveBlending
+      })
+    );
+    group.add(centerSphere);
+    
+    // Position group
+    group.position.set(position.x, position.y, position.z);
+    
+    // Animation parameters - more complex rotation for merkaba
+    group.userData = {
+      rotationSpeed: {
+        x: 0.01,
+        y: 0.015,
+        z: 0.005
+      },
+      floatSpeed: 0.15,
+      floatAmplitude: 1.2,
+      spinSpeed: 0.02,
+      originalPosition: { ...position },
+      type: 'merkaba'
+    };
+    
+    // Add to floating geometry array
+    this.zenElements.floatingGeometry.push({
+      mesh: group,
+      type: 'merkaba'
+    });
+    
+    // Add to scene
+    this.scene.add(group);
+  },
+  
+  // Create Golden Spiral
+  createGoldenSpiral: function(position) {
+    const group = new THREE.Group();
+    const color = this.config.colors.energy[3];
+    
+    // Create spiral using line geometry
+    const points = [];
+    const goldenRatio = 1.618;
+    const turns = 4;
+    const pointsPerTurn = 50;
+    
+    for (let i = 0; i < turns * pointsPerTurn; i++) {
+      const t = i / pointsPerTurn;
+      const angle = t * Math.PI * 2;
+      const radius = Math.pow(goldenRatio, t * 0.5) * 0.1;
+      
+      const x = radius * Math.cos(angle);
+      const y = radius * Math.sin(angle);
+      const z = t * 0.1; // Slight 3D spiral
+      
+      points.push(new THREE.Vector3(x, y, z));
+    }
+    
+    const spiralGeometry = new THREE.BufferGeometry().setFromPoints(points);
+    const spiralMaterial = new THREE.LineBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending
+    });
+    
+    const spiral = new THREE.Line(spiralGeometry, spiralMaterial);
+    group.add(spiral);
+    
+    // Add glowing particles along the spiral
+    const particleGeometry = new THREE.BufferGeometry();
+    const particlePositions = new Float32Array(points.length * 3);
+    
+    points.forEach((point, i) => {
+      particlePositions[i * 3] = point.x;
+      particlePositions[i * 3 + 1] = point.y;
+      particlePositions[i * 3 + 2] = point.z;
+    });
+    
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+    
+    const particleMaterial = new THREE.PointsMaterial({
+      color: color,
+      size: 0.05,
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending
+    });
+    
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    group.add(particles);
+    
+    // Position and scale group
+    group.position.set(position.x, position.y, position.z);
+    group.scale.set(3, 3, 3);
+    
+    // Animation parameters
+    group.userData = {
+      rotationSpeed: {
+        x: 0.005,
+        y: 0.01,
+        z: 0.002
+      },
+      floatSpeed: 0.3,
+      floatAmplitude: 0.5,
+      originalPosition: { ...position },
+      type: 'goldenSpiral'
+    };
+    
+    // Add to floating geometry array
+    this.zenElements.floatingGeometry.push({
+      mesh: group,
+      type: 'goldenSpiral'
+    });
+    
+    // Add to scene
+    this.scene.add(group);
   },
   
   // Helper to create circles for sacred geometry
@@ -1606,7 +2002,11 @@ const ZenSpace = {
     this.updateEffects();
     
     // Render scene
-    this.composer.render();
+    if (this.composer) {
+      this.composer.render();
+    } else {
+      this.renderer.render(this.scene, this.camera);
+    }
   },
   
   // Update material uniforms with current time
@@ -1702,6 +2102,90 @@ const ZenSpace = {
       // Floating movement
       const floatY = Math.sin(this.time.elapsed * userData.floatSpeed) * userData.floatAmplitude;
       mesh.position.y = userData.originalY + floatY;
+    });
+    
+    // NEW: Update floating sacred geometry around the book
+    this.zenElements.floatingGeometry.forEach(geometry => {
+      const mesh = geometry.mesh;
+      const userData = mesh.userData;
+      const originalPos = userData.originalPosition;
+      
+      // Different animation based on type
+      switch(userData.type) {
+        case 'platonic':
+          // Complex rotation on all axes
+          mesh.rotation.x += userData.rotationSpeed.x * this.time.delta;
+          mesh.rotation.y += userData.rotationSpeed.y * this.time.delta;
+          mesh.rotation.z += userData.rotationSpeed.z * this.time.delta;
+          
+          // Orbital movement around the book
+          const orbitAngle = this.time.elapsed * userData.orbitSpeed;
+          const orbitX = originalPos.x + Math.cos(orbitAngle) * userData.orbitRadius;
+          const orbitZ = originalPos.z + Math.sin(orbitAngle) * userData.orbitRadius * 0.5;
+          
+          mesh.position.x = orbitX;
+          mesh.position.z = orbitZ;
+          
+          // Floating movement
+          const floatY = Math.sin(this.time.elapsed * userData.floatSpeed) * userData.floatAmplitude;
+          mesh.position.y = originalPos.y + floatY;
+          break;
+          
+        case 'seedOfLife':
+          // Gentle rotation
+          mesh.rotation.z += userData.rotationSpeed * this.time.delta;
+          
+          // Pulsing scale effect
+          const pulseScale = 1 + Math.sin(this.time.elapsed * userData.pulseSpeed) * 0.1;
+          mesh.scale.set(pulseScale, pulseScale, pulseScale);
+          
+          // Floating movement
+          const floatYSeed = Math.sin(this.time.elapsed * userData.floatSpeed) * userData.floatAmplitude;
+          mesh.position.y = originalPos.y + floatYSeed;
+          break;
+          
+        case 'vesicaPiscis':
+          // Slow rotation
+          mesh.rotation.z += userData.rotationSpeed * this.time.delta;
+          
+          // Scale breathing effect
+          const scaleX = 1 + Math.sin(this.time.elapsed * userData.scaleSpeed) * 0.15;
+          const scaleY = 1 + Math.sin(this.time.elapsed * userData.scaleSpeed + Math.PI/2) * 0.15;
+          mesh.scale.set(scaleX, scaleY, 1);
+          
+          // Floating movement
+          const floatYVesica = Math.sin(this.time.elapsed * userData.floatSpeed) * userData.floatAmplitude;
+          mesh.position.y = originalPos.y + floatYVesica;
+          break;
+          
+        case 'merkaba':
+          // Complex rotation for star tetrahedron
+          mesh.rotation.x += userData.rotationSpeed.x * this.time.delta;
+          mesh.rotation.y += userData.rotationSpeed.y * this.time.delta;
+          mesh.rotation.z += userData.rotationSpeed.z * this.time.delta;
+          
+          // Additional spin on its own axis
+          mesh.children[0].rotation.y += userData.spinSpeed * this.time.delta;
+          mesh.children[1].rotation.y -= userData.spinSpeed * this.time.delta;
+          
+          // Floating with slight wobble
+          const floatYMerkaba = Math.sin(this.time.elapsed * userData.floatSpeed) * userData.floatAmplitude;
+          const wobbleX = Math.sin(this.time.elapsed * userData.floatSpeed * 0.7) * 0.5;
+          mesh.position.x = originalPos.x + wobbleX;
+          mesh.position.y = originalPos.y + floatYMerkaba;
+          break;
+          
+        case 'goldenSpiral':
+          // Multi-axis rotation
+          mesh.rotation.x += userData.rotationSpeed.x * this.time.delta;
+          mesh.rotation.y += userData.rotationSpeed.y * this.time.delta;
+          mesh.rotation.z += userData.rotationSpeed.z * this.time.delta;
+          
+          // Gentle floating
+          const floatYSpiral = Math.sin(this.time.elapsed * userData.floatSpeed) * userData.floatAmplitude;
+          mesh.position.y = originalPos.y + floatYSpiral;
+          break;
+      }
     });
   },
   

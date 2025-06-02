@@ -13,7 +13,8 @@ The WebGL Zen Space is an immersive 3D cosmic background built with Three.js. It
   - Generates energy streams flowing toward the center
   - Implements mandala elements with procedural textures
   - Creates energy centers based on chakra system
-  - Implements sacred geometry patterns (Flower of Life, Metatron's Cube)
+  - Implements sacred geometry patterns (Flower of Life, Metatron's Cube, Sri Yantra)
+  - Creates floating sacred geometry around book (Platonic solids, Seed of Life, Vesica Piscis, Merkaba, Golden Spiral)
   - Adds interactive ripple effects on click
   - Shows zen quotes occasionally
 
@@ -49,7 +50,13 @@ The implementation is integrated into the main index.html file with:
 - **Energy Streams**: Particle streams flowing toward the center (book) from different directions
 - **Mandala Elements**: Procedurally generated mandala textures on 3D circles
 - **Energy Centers**: Glowing spheres representing the chakra system with different colors
-- **Sacred Geometry**: Flower of Life and Metatron's Cube patterns
+- **Sacred Geometry**: Flower of Life, Metatron's Cube, and Sri Yantra patterns
+- **Floating Sacred Geometry** (New): Ancient mystical shapes floating around the book:
+  - **Platonic Solids**: Tetrahedron, Octahedron, Icosahedron, Dodecahedron with wireframe and glowing cores
+  - **Seed of Life**: Seven interconnected circles with pulsing animation
+  - **Vesica Piscis**: Two overlapping circles with breathing scale effect
+  - **Merkaba**: Gold star tetrahedron with counter-rotating parts
+  - **Golden Spiral**: 3D spiral based on golden ratio with particle effects
 - **Interactive Ripples**: Click anywhere to create expanding ripple effects
 - **Zen Quotes**: Occasional zen quotes that fade in and out
 

@@ -50,6 +50,8 @@ The topmost layer containing the interactive elements:
 The primary visual layer implemented with Three.js:
 - Scene, camera, and renderer setup
 - 3D elements (stars, nebula, energy streams)
+- Sacred geometry patterns (static and floating)
+- Floating mystical shapes around the book
 - Shader-based visual effects
 - Post-processing for bloom/glow effects
 - Animation system for organic movement
