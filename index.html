@@ -62,19 +62,19 @@
                 <div class="book-page left-page">
                     <div class="ancient-text">
                         <!-- Changed to <a> tags with direct href attributes -->
-                        <a href="https://daryllgomas.github.io/Zen/" class="ancient-section" id="enter-zen-section">
+                        <a href="https://zen.meatball-labs.com/" class="ancient-section" id="enter-zen-section">
                             <h2 class="ancient-title">Enter Zen</h2>
                             <p class="ancient-description">Journey to the path of enlightenment</p>
                             <div class="ancient-divider">⁂</div>
                         </a>
                         
-                        <a href="https://daryllgomas.github.io/Ancients/" class="ancient-section" id="ancients-section">
+                        <a href="https://ancients.meatball-labs.com/" class="ancient-section" id="ancients-section">
                             <h2 class="ancient-title">Ancients</h2>
                             <p class="ancient-description">Discover the wisdom of ancient civilizations</p>
                             <div class="ancient-divider">⁂</div>
                         </a>
                         
-                        <a href="https://daryllgomas.github.io/BreakTheCode/" class="ancient-section" id="breakthecode-section">
+                        <a href="https://breakthecode.meatball-labs.com/" class="ancient-section" id="breakthecode-section">
                             <h2 class="ancient-title">Break The Code</h2>
                             <p class="ancient-description">Unravel mysteries and decode hidden messages</p>
                             <div class="ancient-divider">⁂</div>
@@ -159,21 +159,21 @@
         // Backup approach for links - add direct click handling on the sections
         if (enterZenSection) {
           enterZenSection.onclick = function(e) {
-            window.location.href = 'https://daryllgomas.github.io/Zen/';
+            window.location.href = 'https://zen.meatball-labs.com/';
             return false; // Prevent default and stop propagation
           };
         }
         
         if (ancientsSection) {
           ancientsSection.onclick = function(e) {
-            window.location.href = 'https://daryllgomas.github.io/Ancients/';
+            window.location.href = 'https://ancients.meatball-labs.com/';
             return false; // Prevent default and stop propagation
           };
         }
         
         if (breakTheCodeSection) {
           breakTheCodeSection.onclick = function(e) {
-            window.location.href = 'https://daryllgomas.github.io/BreakTheCode/';
+            window.location.href = 'https://breakthecode.meatball-labs.com/';
             return false; // Prevent default and stop propagation
           };
         }
@@ -183,19 +183,19 @@
           leftPage.addEventListener('click', function(e) {
             // Check if the click happened inside enter-zen-section
             if (e.target.closest('#enter-zen-section')) {
-              window.location.href = 'https://daryllgomas.github.io/Zen/';
+              window.location.href = 'https://zen.meatball-labs.com/';
               e.preventDefault();
               e.stopPropagation();
             } 
             // Check if the click happened inside ancients-section
             else if (e.target.closest('#ancients-section')) {
-              window.location.href = 'https://daryllgomas.github.io/Ancients/';
+              window.location.href = 'https://ancients.meatball-labs.com/';
               e.preventDefault();
               e.stopPropagation();
             }
             // Check if the click happened inside breakthecode-section
             else if (e.target.closest('#breakthecode-section')) {
-              window.location.href = 'https://daryllgomas.github.io/BreakTheCode/';
+              window.location.href = 'https://breakthecode.meatball-labs.com/';
               e.preventDefault();
               e.stopPropagation();
             }
